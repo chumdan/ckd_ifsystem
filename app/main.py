@@ -9,6 +9,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 
 from app.config import settings
+from app.controllers import pims
 
 # FastAPI 애플리케이션 생성
 app = FastAPI(
@@ -16,6 +17,9 @@ app = FastAPI(
     version=settings.app_version,
     debug=settings.debug
 )
+
+# API 라우터 등록
+app.include_router(pims.router)
 
 # 정적 파일 설정 (CSS, JS, 이미지 등)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
