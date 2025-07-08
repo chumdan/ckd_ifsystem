@@ -1,1 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <!-- 페이지 제목 -->
+    <title>{% block title %}{{ title if title else "CKD PIMS/LIMS 조회 시스템" }}{% endblock %}</title>
+    
+    <!-- 파비콘 -->
+    <link rel="icon" href="{{ url_for('static', path='images/CKD_FAVICON.png') }}" type="image/png">
+    
+    <!-- CSS 파일들 -->
+    <!-- Bootstrap CSS -->
+    <link href="{{ url_for('static', path='css/bootstrap.min.css') }}" rel="stylesheet">
+    
+    <!-- FontAwesome CSS -->
+    <link href="{{ url_for('static', path='css/all.min.css') }}" rel="stylesheet">
+    
+    <!-- DataTables CSS -->
+    <link href="{{ url_for('static', path='css/datatables.min.css') }}" rel="stylesheet">
+    
+    <!-- 기본 CSS -->
+    <link href="{{ url_for('static', path='css/base.css') }}" rel="stylesheet">
+    
+    <!-- CKD 테마 CSS -->
+    <link href="{{ url_for('static', path='css/ckd-theme.css') }}" rel="stylesheet">
+    
+    <!-- 페이지별 추가 CSS -->
+    {% block extra_css %}{% endblock %}
+</head>
 
+<body>
+    <!-- 네비게이션 -->
+    {% include 'navbar.html' %}
+    
+    <!-- 메인 컨텐츠 영역 -->
+    <main class="main-content">
+        <!-- 페이지 컨텐츠 -->
+        <div class="page-content">
+            <div class="container-fluid">
+                <!-- 알림 메시지 영역 -->
+                {% block alerts %}
+                <div id="alert-container">
+                    <!-- JavaScript로 동적 알림 표시 -->
+                </div>
+                {% endblock %}
+                
+                <!-- 메인 컨텐츠 -->
+                {% block content %}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <p class="text-center text-muted">
+                                    컨텐츠가 여기에 표시됩니다.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endblock %}
+            </div>
+        </div>
+    </main>
+    
+    <!-- 푸터 -->
+    {% block footer %}
+    <footer class="footer">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="footer-text">
+                        &copy; {{ current_year if current_year else "2024" }} CKD Corporation. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+    
+    <!-- JavaScript 파일들 -->
+    <!-- jQuery -->
+    <script src="{{ url_for('static', path='js/jquery.min.js') }}"></script>
+    
+    <!-- Bootstrap JS -->
+    <script src="{{ url_for('static', path='js/bootstrap.bundle.min.js') }}"></script>
+    
+    <!-- DataTables JS -->
+    <script src="{{ url_for('static', path='js/datatables.min.js') }}"></script>
+    
+    <!-- Chart.js -->
+    <script src="{{ url_for('static', path='js/chart.min.js') }}"></script>
+    
+    <!-- 기본 JavaScript -->
+    <script src="{{ url_for('static', path='js/pims.js') }}"></script>
+    
+    <!-- 페이지별 추가 JavaScript -->
+    {% block extra_js %}{% endblock %}
+    
+    <!-- 인라인 스크립트 -->
+    {% block inline_js %}{% endblock %}
+</body>
+</html>

@@ -1,1 +1,143 @@
+<!-- 상단 로고 영역 -->
+<div class="top-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 text-center">
+                <a href="{{ url_for('home') }}" class="logo-link">
+                    <img src="{{ url_for('static', path='images/ckd_logo.png') }}" 
+                         alt="CKD Logo" 
+                         class="main-logo">
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- 메인 네비게이션 바 -->
+<nav class="navbar navbar-expand-lg navbar-dark main-navbar">
+    <div class="container-fluid">
+        <!-- 모바일 토글 버튼 -->
+        <button class="navbar-toggler" 
+                type="button" 
+                data-bs-toggle="collapse" 
+                data-bs-target="#navbarNav" 
+                aria-controls="navbarNav" 
+                aria-expanded="false" 
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- 네비게이션 메뉴 -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- 중앙 정렬 메뉴 -->
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('home') }}">
+                        <i class="fas fa-home me-1"></i>
+                        홈
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('pims_page') }}">
+                        <i class="fas fa-database me-1"></i>
+                        PIMS: 공정정보
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-flask me-1"></i>
+                        LIMS: 실험결과
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-chart-line me-1"></i>
+                        생산 IPC 정보
+                    </a>
+                </li>
+            </ul>
+            
+            <!-- 오른쪽 메뉴 -->
+            <ul class="navbar-nav">
+                <!-- 사용자 정보 -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" 
+                       href="#" 
+                       id="userDropdown" 
+                       role="button" 
+                       data-bs-toggle="dropdown" 
+                       aria-expanded="false">
+                        <i class="fas fa-user-circle me-1"></i>
+                        사용자
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-sign-out-alt me-2"></i>
+                                로그아웃
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- 도움말 -->
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#helpModal">
+                        <i class="fas fa-question-circle"></i>
+                        <span class="d-none d-lg-inline ms-1">도움말</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- 도움말 모달 -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="helpModalLabel">
+                    <i class="fas fa-question-circle me-2"></i>
+                    시스템 도움말
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <h6><i class="fas fa-database me-2"></i>PIMS 공정정보 조회</h6>
+                        <ul class="help-list">
+                            <li><strong>품목 코드 입력:</strong> 조회하고자 하는 품목의 코드를 입력하세요.</li>
+                            <li><strong>배치 선택:</strong> 해당 품목의 배치 목록에서 원하는 배치를 선택하세요.</li>
+                            <li><strong>공정 선택:</strong> 배치에 해당하는 공정을 선택하세요.</li>
+                            <li><strong>시간 설정:</strong> 필요시 조회할 시간 범위를 설정하세요.</li>
+                            <li><strong>데이터 조회:</strong> 최대 50건의 데이터가 표시됩니다.</li>
+                        </ul>
+                        
+                        <h6 class="mt-4"><i class="fas fa-flask me-2"></i>LIMS 실험결과 조회</h6>
+                        <ul class="help-list">
+                            <li><strong>샘플 정보:</strong> 실험 샘플의 정보를 확인하세요.</li>
+                            <li><strong>실험 결과:</strong> 각종 실험 결과 데이터를 조회할 수 있습니다.</li>
+                            <li><strong>품질 관리:</strong> QC/QA 데이터를 확인하세요.</li>
+                        </ul>
+                        
+                        <h6 class="mt-4"><i class="fas fa-info-circle me-2"></i>시스템 정보</h6>
+                        <ul class="help-list">
+                            <li><strong>지원 브라우저:</strong> Chrome, Firefox, Edge 최신 버전</li>
+                            <li><strong>데이터 제한:</strong> 한 번에 최대 50건까지 조회 가능</li>
+                            <li><strong>배치 제한:</strong> 최대 10개까지 동시 조회 권장</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>
+                    닫기
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
