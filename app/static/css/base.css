@@ -1,0 +1,257 @@
+/*
+🎨 base.css - CKD DataView 기본 레이아웃 스타일
+
+📝 이 파일의 역할:
+- CKD 로고 기반 색상 테마 정의
+- 기본 레이아웃 스타일 (헤더, 푸터, 콘텐츠)
+- Noto Sans Korean 폰트 적용
+*/
+
+/* ==================== CKD 색상 테마 정의 ==================== */
+
+:root {
+    /* CKD 브랜드 색상 (로고 기반) */
+    --ckd-primary: #1e73be;      /* CKD 파란색 (메인) */
+    --ckd-primary-light: #4a90e2; /* 밝은 파란색 */
+    --ckd-primary-dark: #155a99;  /* 어두운 파란색 */
+    
+    /* 보조 색상 */
+    --ckd-secondary: #6c757d;     /* 회색 */
+    --ckd-success: #28a745;       /* 성공 (초록) */
+    --ckd-warning: #ffc107;       /* 경고 (노랑) */
+    --ckd-danger: #dc3545;        /* 위험 (빨강) */
+    --ckd-info: #17a2b8;          /* 정보 (청록) */
+    
+    /* 배경 및 텍스트 색상 */
+    --ckd-bg-primary: #f8f9fa;    /* 메인 배경 */
+    --ckd-bg-secondary: #e9ecef;  /* 보조 배경 */
+    --ckd-text-primary: #212529;  /* 메인 텍스트 */
+    --ckd-text-secondary: #6c757d; /* 보조 텍스트 */
+    
+    /* 그림자 및 테두리 */
+    --ckd-shadow: 0 2px 4px rgba(30, 115, 190, 0.1);
+    --ckd-border: #dee2e6;
+}
+
+/* ==================== 기본 폰트 및 레이아웃 ==================== */
+
+body {
+    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ckd-text-primary);
+    background-color: var(--ckd-bg-primary);
+    margin: 0;
+    padding: 0;
+}
+
+/* 제목 폰트 굵기 조정 */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 500;
+    color: var(--ckd-primary-dark);
+}
+
+/* ==================== 상단 네비게이션 스타일 ==================== */
+
+.navbar-ckd {
+    background: linear-gradient(135deg, var(--ckd-primary) 0%, var(--ckd-primary-light) 100%);
+    box-shadow: var(--ckd-shadow);
+    border: none;
+}
+
+.navbar-brand {
+    font-weight: 600 !important;
+    font-size: 1.4rem !important;
+    color: white !important;
+}
+
+.navbar-brand:hover {
+    color: #f8f9fa !important;
+}
+
+.navbar-brand img {
+    filter: brightness(1.1);
+}
+
+/* 네비게이션 링크 스타일 */
+.navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    padding: 8px 16px !important;
+    border-radius: 6px;
+    margin: 0 4px;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: white !important;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-nav .nav-link.active {
+    color: white !important;
+    background-color: rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+}
+
+/* 모바일 메뉴 토글 */
+.navbar-toggler {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+}
+
+/* ==================== 메인 콘텐츠 영역 ==================== */
+
+.main-content {
+    padding: 30px 0;
+    min-height: calc(100vh - 180px);
+}
+
+/* 페이지 제목 스타일 */
+.page-title {
+    color: var(--ckd-primary-dark);
+    font-weight: 600;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid var(--ckd-primary);
+}
+
+/* 카드 스타일 */
+.card {
+    border: 1px solid var(--ckd-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--ckd-primary) 0%, var(--ckd-primary-light) 100%);
+    color: white;
+    border-bottom: none;
+    font-weight: 600;
+    border-radius: 10px 10px 0 0 !important;
+}
+
+/* ==================== 버튼 스타일 ==================== */
+
+.btn-ckd-primary {
+    background: linear-gradient(135deg, var(--ckd-primary) 0%, var(--ckd-primary-light) 100%);
+    border: none;
+    color: white;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.btn-ckd-primary:hover {
+    background: linear-gradient(135deg, var(--ckd-primary-dark) 0%, var(--ckd-primary) 100%);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(30, 115, 190, 0.3);
+}
+
+/* ==================== 폼 요소 스타일 ==================== */
+
+.form-control:focus {
+    border-color: var(--ckd-primary);
+    box-shadow: 0 0 0 0.2rem rgba(30, 115, 190, 0.25);
+}
+
+.form-select:focus {
+    border-color: var(--ckd-primary);
+    box-shadow: 0 0 0 0.2rem rgba(30, 115, 190, 0.25);
+}
+
+/* ==================== 테이블 스타일 ==================== */
+
+.table th {
+    background-color: var(--ckd-primary);
+    color: white;
+    font-weight: 600;
+    border: none;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(30, 115, 190, 0.05);
+}
+
+/* ==================== 하단 푸터 스타일 ==================== */
+
+.footer {
+    background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+    color: white;
+    text-align: center;
+    padding: 25px 0;
+    margin-top: auto;
+    border-top: 3px solid var(--ckd-primary);
+}
+
+.footer p {
+    margin-bottom: 0;
+    font-size: 14px;
+}
+
+.footer .text-muted {
+    color: #adb5bd !important;
+}
+
+/* ==================== 로딩 및 알림 스타일 ==================== */
+
+.loading {
+    color: var(--ckd-primary);
+}
+
+.alert-ckd {
+    border-left: 4px solid var(--ckd-primary);
+    background-color: rgba(30, 115, 190, 0.1);
+    color: var(--ckd-primary-dark);
+}
+
+/* ==================== 반응형 스타일 ==================== */
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 20px 0;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+    
+    .navbar-brand {
+        font-size: 1.2rem !important;
+    }
+    
+    .card {
+        margin-bottom: 20px;
+    }
+}
+
+/* ==================== 스크롤바 커스터마이징 ==================== */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--ckd-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--ckd-primary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--ckd-primary-dark);
+} 

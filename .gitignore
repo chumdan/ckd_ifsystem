@@ -1,0 +1,61 @@
+# Python 관련 파일들
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyo
+*.pyd
+.Python
+
+# 가상환경
+venv/
+env/
+ENV/
+.venv/
+
+# 환경변수 파일 (중요! 데이터베이스 비밀번호 등이 들어있음)
+.env
+.env.local
+.env.production
+
+# IDE 설정 파일들
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 로그 파일들
+*.log
+logs/
+
+# 데이터베이스 파일들 (개발용 SQLite 등)
+*.db
+*.sqlite
+*.sqlite3
+
+# OS 관련 파일들
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# pytest 캐시
+.pytest_cache/
+.coverage
+htmlcov/
+
+# mypy 캐시
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# FastAPI 관련
+*.pid
+
+# 기타 임시 파일들
+*.tmp
+*.temp
+.cache/
