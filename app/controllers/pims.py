@@ -120,8 +120,12 @@ async def api_get_data_basic(request: GetDataRequest):
     }
     """
     try:
-        # limit 값 검증 (최대 1000건)
-        limit = min(request.limit, 1000) if request.limit > 0 else 50
+        # limit 값 검증 및 처리
+        # limit <= 0이면 제한 없음 (모든 데이터), limit > 0이면 해당 값 사용 (최대 1000건)
+        if request.limit <= 0:
+            limit = 0  # 제한 없음 (모든 데이터)
+        else:
+            limit = min(request.limit, 1000)  # 최대 1000건 제한
         
         # 서비스 함수 호출
         result = get_pims_data_basic(
@@ -182,8 +186,12 @@ async def api_get_data_l23(request: GetDataRequest):
     }
     """
     try:
-        # limit 값 검증 (최대 1000건)
-        limit = min(request.limit, 1000) if request.limit > 0 else 50
+        # limit 값 검증 및 처리
+        # limit <= 0이면 제한 없음 (모든 데이터), limit > 0이면 해당 값 사용 (최대 1000건)
+        if request.limit <= 0:
+            limit = 0  # 제한 없음 (모든 데이터)
+        else:
+            limit = min(request.limit, 1000)  # 최대 1000건 제한
         
         # 서비스 함수 호출
         result = get_pims_data_l23(

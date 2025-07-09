@@ -32,3 +32,6 @@ pydantic-settings==2.1.0
 
 # 로깅
 loguru==0.7.2
+
+# 데이터 처리 (CSV 파일 읽기용)
+pandas==2.1.4

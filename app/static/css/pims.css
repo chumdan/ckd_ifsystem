@@ -1,0 +1,327 @@
+/*
+ * PIMS 페이지 전용 CSS
+ * PIMS 공정정보 조회 페이지에만 적용되는 스타일
+ */
+
+/* ==================== 
+   페이지 제목 
+==================== */
+.simple-title {
+    color: #000000;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+/* ==================== 
+   섹션 헤더 (심플)
+==================== */
+.section-header {
+    background-color: #f8f9fa;
+    color: #495057;
+    border: 1px solid #dee2e6;
+    border-bottom: none;
+    border-radius: 0.5rem 0.5rem 0 0;
+    padding: 1rem 1.5rem;
+}
+
+.section-header h5 {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.section-header .text-white-50 {
+    color: #6c757d !important;
+}
+
+/* ==================== 
+   조회 결과 헤더 
+==================== */
+.result-header {
+    background-color: #f8f9fa;
+    color: #495057;
+    border: 1px solid #dee2e6;
+    border-bottom: none;
+    border-radius: 0.5rem 0.5rem 0 0;
+    padding: 0.75rem 1.5rem;
+}
+
+.result-header h6 {
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+/* ==================== 
+   카드 스타일 
+==================== */
+.card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1.5rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-header {
+    border-bottom: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+}
+
+/* ==================== 
+   폼 요소 스타일 
+==================== */
+.form-text {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+.text-danger {
+    font-weight: bold;
+    color: #dc3545 !important;
+}
+
+.form-control:focus {
+    border-color: var(--ckd-primary);
+    box-shadow: 0 0 0 0.2rem rgba(33, 66, 147, 0.25);
+}
+
+.form-select:focus {
+    border-color: var(--ckd-primary);
+    box-shadow: 0 0 0 0.2rem rgba(33, 66, 147, 0.25);
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+/* ==================== 
+   버튼 스타일 
+==================== */
+.btn-success {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    font-weight: 500;
+    color: white;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+}
+
+.btn-success:hover {
+    background-color: #5a6268;
+    border-color: #5a6268;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-success:focus {
+    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+}
+
+#searchBtn1:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* CSV 다운로드 버튼 스타일 */
+.btn-outline-success {
+    color: #28a745;
+    border-color: #28a745;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-success:hover {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-outline-success:focus {
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.btn-outline-success:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ==================== 
+   DataTables 표 스타일 
+==================== */
+table.dataTable {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 0.5rem !important;
+    overflow: hidden;
+    width: 100% !important;
+    table-layout: auto !important;  /* 컬럼 폭 자동 조정 */
+    min-width: 100% !important;     /* 최소 폭 보장 */
+}
+
+table.dataTable thead th {
+    background-color: #e9ecef !important;
+    color: #495057 !important;
+    border: 1px solid #dee2e6 !important;
+    font-weight: 500 !important;
+    padding: 0.75rem !important;
+    text-align: center !important;
+    white-space: nowrap !important;  /* 헤더 텍스트 줄바꿈 방지 */
+    min-width: 80px !important;      /* 최소 폭 설정 */
+}
+
+table.dataTable thead th:hover {
+    background-color: #dee2e6 !important;
+}
+
+table.dataTable tbody td {
+    padding: 0.75rem !important;
+    text-align: center !important;
+    border-top: 1px solid #dee2e6 !important;
+    white-space: nowrap !important;  /* 데이터 텍스트 줄바꿈 완전 방지 */
+    overflow: visible !important;    /* 데이터가 길면 셀 밖으로 표시 */
+    min-width: 80px !important;      /* 최소 폭 설정 */
+    max-width: none !important;      /* 최대 폭 제한 해제 */
+    word-break: keep-all !important; /* 단어 분리 방지 */
+    text-overflow: clip !important;  /* 텍스트 잘림 방지 */
+    line-height: 1.2 !important;     /* 행 높이 고정 */
+}
+
+/* DataTables에서 강제로 적용되는 폭 제한 해제 */
+table.dataTable.no-footer {
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+table.dataTable tbody tr {
+    background-color: white;
+    height: auto !important;         /* 행 높이 자동 조정 방지 */
+}
+
+table.dataTable tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+table.dataTable tbody tr:hover {
+    background-color: #e9ecef !important;
+}
+
+/* DataTables 가로 스크롤 영역 */
+.dataTables_wrapper .table-responsive {
+    overflow-x: auto !important;    /* 테이블이 길면 가로 스크롤 */
+    width: 100% !important;
+}
+
+/* DataTables 전체 래퍼 */
+.dataTables_wrapper {
+    width: 100% !important;
+    overflow-x: auto !important;
+}
+
+/* DataTables 스크롤 컨테이너 */
+.dataTables_scrollX {
+    overflow-x: auto !important;
+    width: 100% !important;
+}
+
+/* 모든 DataTables 셀에 강제 적용 - 더 구체적인 선택자 */
+table#pimsTable1 td,
+table#pimsTable1 th,
+#pimsTable1 td,
+#pimsTable1 th,
+.dataTable td,
+.dataTable th {
+    white-space: nowrap !important;
+    word-wrap: normal !important;
+    word-break: keep-all !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    vertical-align: middle !important;
+}
+
+/* DataTables가 동적으로 생성하는 요소들에도 적용 */
+table.dataTable tbody tr td {
+    white-space: nowrap !important;
+    word-wrap: normal !important;
+    word-break: keep-all !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+}
+
+/* 특정 컬럼에 대한 강제 적용 (필요시) */
+table.dataTable td:nth-child(n) {
+    white-space: nowrap !important;
+    word-wrap: normal !important;
+    word-break: keep-all !important;
+    max-width: none !important;
+    min-width: auto !important;
+}
+
+/* DataTables 페이징 스타일 */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0.375rem 0.75rem;
+    margin: 0 0.125rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    color: #495057;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background-color: var(--ckd-primary);
+    border-color: var(--ckd-primary);
+    color: white;
+}
+
+/* DataTables 정보 표시 스타일 */
+.dataTables_wrapper .dataTables_info {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* ==================== 
+   반응형 스타일 
+==================== */
+@media (max-width: 768px) {
+    .simple-title {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+    }
+    
+    .form-text {
+        font-size: 0.75rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    table.dataTable thead th,
+    table.dataTable tbody td {
+        padding: 0.5rem !important;
+        font-size: 0.875rem;
+    }
+    
+    .btn-success {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+}

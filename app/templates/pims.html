@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}PIMS: 공정정보 조회 시스템{% endblock %}
+
+{% block content %}
+<!-- PIMS 공정정보 조회 시스템 메인 페이지 -->
+<div class="container-fluid">
+    <!-- 페이지 제목 -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2 class="page-title simple-title">
+                <i class="fas fa-database me-2"></i>
+                PIMS: 공정정보 조회 시스템
+            </h2>
+            <hr>
+        </div>
+    </div>
+
+    <!-- 1번 기능: PIMS 공정정보 DATA 조회 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <!-- 섹션 제목 -->
+            <div class="card shadow-ckd">
+                <div class="card-header section-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-search me-2"></i>
+                        1. PIMS: 공정정보 DATA 조회
+                    </h5>
+                    <small class="text-black-50">배치를 선택하여 공정 데이터를 조회합니다</small>
+                </div>
+                <div class="card-body">
+                    <!-- 조회 폼 (가로 배치) -->
+                    <form id="pimsDataForm">
+                        <div class="row g-3 align-items-center">
+                            <!-- 제품 타입 선택 -->
+                            <div class="col-md-1">
+                                <label for="productType1" class="form-label">
+                                    <i class="fas fa-tags me-1"></i>
+                                    제품 타입 <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" 
+                                        id="productType1" 
+                                        name="product_type"
+                                        required>
+                                    <option value="">타입 선택</option>
+                                    <option value="basic">1-1: 기존고형제</option>
+                                    <option value="l23">2-3: 스마트고형제</option>
+                                </select>
+                                <div class="form-text">제품 타입을 선택하세요</div>
+                            </div>
+
+                            <!-- 품목코드 입력 -->
+                            <div class="col-md-2">
+                                <label for="itemCode1" class="form-label">
+                                    <i class="fas fa-barcode me-1"></i>
+                                    품목코드 <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="itemCode1" 
+                                       name="itemcode"
+                                       placeholder="예: 029124A" 
+                                       required>
+                                <div class="form-text">품목 코드를 입력하세요</div>
+                            </div>
+
+                            <!-- 배치 선택 -->
+                            <div class="col-md-2">
+                                <label for="batchSelect1" class="form-label">
+                                    <i class="fas fa-list me-1"></i>
+                                    배치 선택 <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" 
+                                        id="batchSelect1" 
+                                        name="batch_no"
+                                        required 
+                                        disabled>
+                                    <option value="">품목코드 입력 후 선택</option>
+                                </select>
+                                <div class="form-text">다중 배치 선택 가능</div>
+                            </div>
+
+                            <!-- 공정 선택 -->
+                            <div class="col-md-2">
+                                <label for="processSelect1" class="form-label">
+                                    <i class="fas fa-cogs me-1"></i>
+                                    공정 선택 <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" 
+                                        id="processSelect1" 
+                                        name="proc_code"
+                                        required 
+                                        disabled>
+                                    <option value="">배치 선택 후 선택</option>
+                                </select>
+                                <div class="form-text">공정을 선택하세요</div>
+                            </div>
+
+                            <!-- 시작시간 -->
+                            <div class="col-md-2">
+                                <label for="startTime1" class="form-label">
+                                    <i class="fas fa-clock me-1"></i>
+                                    시작시간
+                                </label>
+                                <input type="datetime-local" 
+                                       class="form-control" 
+                                       id="startTime1" 
+                                       name="start_time">
+                                <div class="form-text">선택사항</div>
+                            </div>
+
+                            <!-- 종료시간 -->
+                            <div class="col-md-2">
+                                <label for="endTime1" class="form-label">
+                                    <i class="fas fa-clock me-1"></i>
+                                    종료시간
+                                </label>
+                                <input type="datetime-local" 
+                                       class="form-control" 
+                                       id="endTime1" 
+                                       name="end_time">
+                                <div class="form-text">선택사항</div>
+                            </div>
+
+                            <!-- 조회 버튼 -->
+                            <div class="col-md-1">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" 
+                                        class="btn btn-success btn-lg w-100 d-block" 
+                                        id="searchBtn1">
+                                    <i class="fas fa-search me-1"></i>
+                                    데이터 조회
+                                </button>
+                                <div class="form-text">&nbsp;</div>
+                            </div>
+                        </div>
+                    </form>
+
+
+    <!-- 조회 결과 영역 (나중에 구현) -->
+    <div class="row">
+        <div class="col-12">
+            <div id="resultContainer1" class="d-none">
+                <!-- 여기에 조회 결과 테이블이 표시됩니다 -->
+                <div class="card shadow-ckd">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-table me-2"></i>
+                            조회 결과
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-center text-muted">
+                            조회 결과가 여기에 표시됩니다
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<!-- PIMS 페이지 전용 CSS (필요시 추가) -->
+<style>
+/* 폼 요소 간격 조정 */
+.form-text {
+    font-size: 0.8rem;
+}
+
+/* 필수 입력 표시 */
+.text-danger {
+    font-weight: bold;
+}
+
+/* 버튼 스타일 개선 */
+#searchBtn1:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+</style>
+{% endblock %}
