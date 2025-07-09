@@ -73,11 +73,13 @@
                                 <select class="form-select" 
                                         id="batchSelect1" 
                                         name="batch_no"
+                                        multiple
+                                        size="3"
                                         required 
                                         disabled>
                                     <option value="">품목코드 입력 후 선택</option>
                                 </select>
-                                <div class="form-text">다중 배치 선택 가능</div>
+                                <div class="form-text">Ctrl+클릭으로 다중선택</div>
                             </div>
 
                             <!-- 공정 선택 -->
@@ -96,30 +98,18 @@
                                 <div class="form-text">공정을 선택하세요</div>
                             </div>
 
-                            <!-- 시작시간 -->
-                            <div class="col-md-2">
-                                <label for="startTime1" class="form-label">
-                                    <i class="fas fa-clock me-1"></i>
-                                    시작시간
+                            <!-- 시간 설정 안내 -->
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    시간 설정 안내
                                 </label>
-                                <input type="datetime-local" 
-                                       class="form-control" 
-                                       id="startTime1" 
-                                       name="start_time">
-                                <div class="form-text">선택사항</div>
-                            </div>
-
-                            <!-- 종료시간 -->
-                            <div class="col-md-2">
-                                <label for="endTime1" class="form-label">
-                                    <i class="fas fa-clock me-1"></i>
-                                    종료시간
-                                </label>
-                                <input type="datetime-local" 
-                                       class="form-control" 
-                                       id="endTime1" 
-                                       name="end_time">
-                                <div class="form-text">선택사항</div>
+                                <div class="alert alert-info py-2 mb-0">
+                                    <small>
+                                        <strong>배치 1개:</strong> 단일 시간 설정<br>
+                                        <strong>배치 여러개:</strong> 배치별 개별 시간 설정
+                                    </small>
+                                </div>
                             </div>
 
                             <!-- 조회 버튼 -->
@@ -135,6 +125,60 @@
                             </div>
                         </div>
                     </form>
+
+                    <!-- 시간 설정 섹션들 -->
+                    <div class="mt-4">
+                        <!-- 단일/공통 시간 설정 섹션 -->
+                        <div id="singleTimeSection" class="time-section">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="startTime1" class="form-label">
+                                        <i class="fas fa-play me-1"></i>
+                                        시작시간
+                                    </label>
+                                    <input type="datetime-local" 
+                                           class="form-control time-input" 
+                                           id="startTime1" 
+                                           name="start_time">
+                                    <div class="form-text">선택사항</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="endTime1" class="form-label">
+                                        <i class="fas fa-stop me-1"></i>
+                                        종료시간
+                                    </label>
+                                    <input type="datetime-local" 
+                                           class="form-control time-input" 
+                                           id="endTime1" 
+                                           name="end_time">
+                                    <div class="form-text">선택사항</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="alert alert-warning py-2 mt-4">
+                                        <i class="fas fa-clock me-2"></i>
+                                        <small>
+                                            <strong>PIMS 빅데이터 조회 및 다운로드 시 다소 시간이 소요될 수 있습니다.</strong>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 배치별 개별 시간 설정 섹션 -->
+                        <div id="multipleTimeSection" class="time-section d-none">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                배치별로 개별 시간을 설정할 수 있습니다.
+                            </div>
+                            <div id="batchTimeContainer">
+                                <!-- 동적으로 생성되는 배치별 시간 필드들 -->
+                            </div>
+                            <div class="alert alert-warning py-2 mt-3">
+                                <i class="fas fa-clock me-2"></i>
+                                <small><strong>PIMS 빅데이터 조회 시 시간이 다소 소요될 수 있습니다.</strong></small>
+                            </div>
+                        </div>
+                    </div>
 
 
     <!-- 조회 결과 영역 (나중에 구현) -->
@@ -162,22 +206,5 @@
 {% endblock %}
 
 {% block extra_css %}
-<!-- PIMS 페이지 전용 CSS (필요시 추가) -->
-<style>
-/* 폼 요소 간격 조정 */
-.form-text {
-    font-size: 0.8rem;
-}
-
-/* 필수 입력 표시 */
-.text-danger {
-    font-weight: bold;
-}
-
-/* 버튼 스타일 개선 */
-#searchBtn1:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-</style>
+<!-- PIMS 페이지 전용 CSS는 pims.css 파일에서 로드됩니다 -->
 {% endblock %}
