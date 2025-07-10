@@ -289,6 +289,12 @@ function handleStatsResponse(data) {
     
     if (data.success && data.data && data.data.length > 0) {
         console.log('통계 데이터 표시:', data.data.length, '행');
+        
+        // 📊 데이터 캐싱 (차트용 재사용)
+        currentStatsData = data.data;
+        currentFormData = collectStatsFormData();
+        console.log('✅ 통계 데이터 캐싱 완료 - 차트 생성 시 재조회 없음');
+        
         displayStatsData(data.data);
         showStatsInfo(data.data.length);
     } else {
@@ -856,22 +862,161 @@ function createOrderedStatsHeaders(sampleRow) {
 function showChartAnalysis(statsData) {
     console.log('차트 분석 영역을 표시합니다.');
     
-    // 차트 분석 영역 표시
-    const chartSection = document.getElementById('chartAnalysisSection');
+    // 차트 분석 영역 표시 (HTML ID와 매칭)
+    const chartSection = document.getElementById('chartAnalysisContainer');
     if (chartSection) {
         chartSection.style.display = 'block';
         
-        // 차트 로드 버튼 활성화
-        const loadChartBtn = document.getElementById('loadChartBtn');
-        if (loadChartBtn) {
-            loadChartBtn.disabled = false;
-            loadChartBtn.onclick = loadChartData;
+        // 차트 생성 버튼 추가 (테이블 아래)
+        addChartButton();
+    }
+}
+
+/**
+ * 차트 생성 버튼을 테이블 아래에 추가
+ */
+function addChartButton() {
+    // 기존 버튼이 있으면 제거
+    const existingBtn = document.getElementById('chartGenerateBtn');
+    if (existingBtn) {
+        existingBtn.remove();
+    }
+    
+    // 차트 생성 버튼 HTML
+    const buttonHtml = `
+        <div class="d-flex justify-content-end mt-3 mb-3" id="chartButtonContainer">
+            <button type="button" 
+                    class="btn btn-info btn-sm" 
+                    id="chartGenerateBtn"
+                    style="padding: 8px 16px;">
+                <i class="fas fa-chart-line me-2"></i>
+                차트 분석
+                <small class="ms-2" style="font-size: 10px; opacity: 0.8;">
+                    <i class="fas fa-bolt"></i> 빠른처리
+                </small>
+            </button>
+        </div>
+    `;
+    
+    // 테이블 컨테이너 뒤에 버튼 추가
+    const tableContainer = document.getElementById('statsTableContainer');
+    if (tableContainer) {
+        tableContainer.insertAdjacentHTML('afterend', buttonHtml);
+        
+        // 버튼 이벤트 리스너 추가
+        const chartBtn = document.getElementById('chartGenerateBtn');
+        if (chartBtn) {
+            chartBtn.addEventListener('click', generateChartsFromCachedData);
         }
     }
 }
 
 /**
- * 차트 데이터 로드 (Python 백엔드에서 모든 계산 처리)
+ * 캐싱된 데이터로 차트 생성 (재조회 없음)
+ */
+function generateChartsFromCachedData() {
+    console.log('📊 캐싱된 데이터로 차트 생성 시작...');
+    
+    if (!currentStatsData || !currentFormData) {
+        showAlert('먼저 통계 데이터를 조회해주세요.', 'warning');
+        return;
+    }
+    
+    try {
+        // 로딩 표시
+        showChartLoading(true);
+        
+        // 캐싱된 통계 데이터에서 차트 데이터 생성
+        const chartData = generateChartDataFromStats(currentStatsData);
+        
+        if (chartData) {
+            currentChartData = chartData;
+            console.log('✅ 차트 데이터 생성 성공:', currentChartData);
+            
+            // 차트 렌더링
+            renderTrendChart();
+            renderCvChart();
+            
+            // 로딩 숨기기 및 차트 영역 표시
+            showChartLoading(false);
+            showChartContainer(true);
+            
+            showAlert(`차트 생성 완료! ${chartData.variables.length}개 변수 분석`, 'success');
+            
+        } else {
+            throw new Error('차트 데이터 생성 실패');
+        }
+        
+    } catch (error) {
+        console.error('❌ 차트 생성 중 오류:', error);
+        showAlert('차트 생성 중 오류가 발생했습니다.', 'danger');
+        showChartLoading(false);
+    }
+}
+
+/**
+ * 통계 데이터에서 차트 데이터 생성 (JavaScript에서 처리)
+ */
+function generateChartDataFromStats(statsData) {
+    console.log('📈 통계 데이터에서 차트 데이터 생성...');
+    
+    if (!statsData || statsData.length === 0) {
+        console.error('통계 데이터가 없습니다.');
+        return null;
+    }
+    
+    // 변수 목록 추출 (평균값 컬럼들)
+    const sampleRow = statsData[0];
+    const variables = [];
+    const trendData = {};
+    const cvData = [];
+    
+    // 평균, 표준편차 컬럼 찾기
+    for (const key in sampleRow) {
+        if (key.includes('_평균')) {
+            const varName = key.replace('_평균', '');
+            variables.push(varName);
+            
+            // 트렌드 데이터 생성 (배치별 평균값)
+            trendData[varName] = statsData.map(row => ({
+                batch: row['배치번호'] || row['batch_no'] || 'Unknown',
+                value: parseFloat(row[key]) || 0
+            }));
+            
+            // CV 데이터 생성 (변동계수 = 표준편차/평균 * 100)
+            const stdKey = key.replace('_평균', '_표준편차');
+            if (sampleRow.hasOwnProperty(stdKey)) {
+                const avgValues = statsData.map(row => parseFloat(row[key]) || 0);
+                const stdValues = statsData.map(row => parseFloat(row[stdKey]) || 0);
+                
+                // 전체 평균과 평균 표준편차로 CV 계산
+                const totalAvg = avgValues.reduce((a, b) => a + b, 0) / avgValues.length;
+                const totalStd = stdValues.reduce((a, b) => a + b, 0) / stdValues.length;
+                const cv = totalAvg !== 0 ? (totalStd / totalAvg) * 100 : 0;
+                
+                cvData.push({
+                    variable: varName,
+                    cv: cv
+                });
+            }
+        }
+    }
+    
+    console.log(`📊 차트 데이터 생성 완료: ${variables.length}개 변수, ${statsData.length}개 배치`);
+    
+    return {
+        variables: variables,
+        trend_data: trendData,
+        cv_data: cvData,
+        summary: {
+            total_variables: variables.length,
+            total_batches: statsData.length
+        }
+    };
+}
+
+/**
+ * 차트 데이터 로드 (Python 백엔드에서 모든 계산 처리) - DEPRECATED
  */
 async function loadChartData() {
     console.log('📊 차트 데이터 로드 시작...');
@@ -993,12 +1138,37 @@ function updateTrendChart(selectedVariable) {
                 backgroundColor: 'rgba(0, 123, 255, 0.1)',
                 borderWidth: 2,
                 fill: true,
-                tension: 0.4  // 부드러운 곡선
+                tension: 0.4,  // 부드러운 곡선
+                clip: { left: 0, top: 0, right: 0, bottom: 0 },  // 데이터셋 레벨에서 강제 클리핑
+                pointRadius: 3,
+                pointHoverRadius: 5
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,  // 2열 레이아웃을 위해 false
+            clip: { left: 0, top: 0, right: 0, bottom: 0 },  // 차트 영역에서 강제 클리핑 (여백 없음)
+            animation: {
+                duration: 0  // 애니메이션 완전 비활성화 (그래프 선이 밖에서 들어오는 현상 방지)
+            },
+            layout: {
+                padding: {
+                    top: 15,
+                    right: 15,
+                    bottom: 15,
+                    left: 15
+                }
+            },
+            elements: {
+                line: {
+                    tension: 0.4,
+                    borderWidth: 2
+                },
+                point: {
+                    radius: 3,
+                    hoverRadius: 5
+                }
+            },
             plugins: {
                 title: {
                     display: true,
@@ -1018,6 +1188,18 @@ function updateTrendChart(selectedVariable) {
                     title: {
                         display: true,
                         text: '배치번호'
+                    },
+                    ticks: {
+                        maxRotation: 90,  // X축 라벨 90도 회전
+                        minRotation: 90,
+                        font: {
+                            size: 10
+                        }
+                    },
+                    grid: {
+                        display: true,
+                        drawBorder: true,
+                        borderWidth: 2
                     }
                 },
                 y: {
@@ -1025,8 +1207,17 @@ function updateTrendChart(selectedVariable) {
                         display: true,
                         text: '평균값'
                     },
-                    beginAtZero: false
+                    beginAtZero: false,
+                    grid: {
+                        display: true,
+                        drawBorder: true,
+                        borderWidth: 2
+                    }
                 }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
             }
         }
     });
@@ -1081,7 +1272,19 @@ function renderCvChart() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,  // 2열 레이아웃을 위해 false
+            clip: { left: 0, top: 0, right: 0, bottom: 0 },  // 차트 영역에서 강제 클리핑 (여백 없음)
+            animation: {
+                duration: 0  // 애니메이션 완전 비활성화 (그래프 선이 밖에서 들어오는 현상 방지)
+            },
+            layout: {
+                padding: {
+                    top: 15,
+                    right: 15,
+                    bottom: 15,
+                    left: 15
+                }
+            },
             plugins: {
                 title: {
                     display: true,
@@ -1101,6 +1304,17 @@ function renderCvChart() {
                     title: {
                         display: true,
                         text: '변수명'
+                    },
+                    ticks: {
+                        maxRotation: 90,  // X축 라벨 90도 회전
+                        minRotation: 90,
+                        font: {
+                            size: 10
+                        }
+                    },
+                    grid: {
+                        display: true,
+                        drawBorder: true
                     }
                 },
                 y: {
@@ -1108,8 +1322,16 @@ function renderCvChart() {
                         display: true,
                         text: '변동계수 (%)'
                     },
-                    beginAtZero: true
+                    beginAtZero: true,
+                    grid: {
+                        display: true,
+                        drawBorder: true
+                    }
                 }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
             }
         }
     });
@@ -1130,11 +1352,16 @@ function updateVariableDropdown() {
     dropdown.innerHTML = '';
     
     if (currentChartData && currentChartData.variables) {
-        currentChartData.variables.forEach(variable => {
+        currentChartData.variables.forEach((variable, index) => {
             const option = document.createElement('option');
             option.value = variable;
             option.textContent = variable;
             dropdown.appendChild(option);
+            
+            // 첫 번째 변수를 기본 선택
+            if (index === 0) {
+                option.selected = true;
+            }
         });
         
         // 드롭다운 변경 이벤트
@@ -1151,17 +1378,13 @@ function updateVariableDropdown() {
  * 차트 로딩 상태 표시/숨기기
  */
 function showChartLoading(show) {
-    const loadingDiv = document.getElementById('chartLoadingMessage');
-    if (loadingDiv) {
-        loadingDiv.style.display = show ? 'block' : 'none';
-    }
-    
-    const loadBtn = document.getElementById('loadChartBtn');
-    if (loadBtn) {
-        loadBtn.disabled = show;
-        loadBtn.innerHTML = show 
-            ? '<i class="fas fa-spinner fa-spin me-2"></i>차트 생성 중...'
-            : '<i class="fas fa-chart-line me-2"></i>차트 생성';
+    // 차트 생성 버튼 상태 변경
+    const chartBtn = document.getElementById('chartGenerateBtn');
+    if (chartBtn) {
+        chartBtn.disabled = show;
+        chartBtn.innerHTML = show 
+            ? '<i class="fas fa-spinner fa-spin me-2"></i>분석 중...<small class="ms-2" style="font-size: 10px; opacity: 0.8;">잠시만 기다려주세요</small>'
+            : '<i class="fas fa-chart-line me-2"></i>차트 분석<small class="ms-2" style="font-size: 10px; opacity: 0.8;"><i class="fas fa-bolt"></i> 빠른처리</small>';
     }
 }
 
@@ -1169,13 +1392,92 @@ function showChartLoading(show) {
  * 차트 컨테이너 표시/숨기기
  */
 function showChartContainer(show) {
-    const containers = ['trendChartContainer', 'cvChartContainer'];
-    containers.forEach(id => {
-        const container = document.getElementById(id);
-        if (container) {
-            container.style.display = show ? 'block' : 'none';
+    // 전체 차트 영역 표시
+    const chartSection = document.getElementById('chartAnalysisContainer');
+    if (chartSection) {
+        chartSection.style.display = show ? 'block' : 'none';
+    }
+    
+    // 2열 레이아웃 강제 적용 (완전한 CSS Grid)
+    if (show) {
+        const chartRow = chartSection?.querySelector('.row');
+        if (chartRow) {
+            // Bootstrap 클래스 제거하고 완전히 CSS Grid로 대체
+            chartRow.className = 'chart-grid-container';
+            chartRow.style.cssText = `
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 15px !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+            `;
+            
+            // 개별 컬럼 스타일 (Bootstrap col-md-6 클래스 무시)
+            const chartCols = chartRow.querySelectorAll('.col-md-6');
+            chartCols.forEach((col, index) => {
+                col.className = `chart-col-${index + 1}`;
+                col.style.cssText = `
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    width: 100% !important;
+                    max-width: none !important;
+                    flex: none !important;
+                `;
+                
+                // 카드 스타일도 조정
+                const card = col.querySelector('.card');
+                if (card) {
+                    card.style.cssText = `
+                        height: 500px !important;
+                        margin: 0 !important;
+                    `;
+                }
+                
+                // 차트 컨테이너 스타일
+                const chartContainer = col.querySelector('.chart-container');
+                if (chartContainer) {
+                    chartContainer.style.cssText = `
+                        position: relative !important;
+                        height: 380px !important;
+                        width: 100% !important;
+                        overflow: hidden !important;
+                        border: 1px solid #dee2e6 !important;
+                        border-radius: 4px !important;
+                    `;
+                }
+            });
+            
+            // 차트 리사이즈 (레이아웃 적용 후)
+            setTimeout(() => {
+                if (trendChart) {
+                    trendChart.resize();
+                    // 차트 영역 강제 제한
+                    const trendCanvas = document.getElementById('trendChart');
+                    if (trendCanvas) {
+                        trendCanvas.style.cssText += `
+                            max-width: 100% !important;
+                            max-height: 100% !important;
+                            position: relative !important;
+                        `;
+                    }
+                }
+                if (cvChart) {
+                    cvChart.resize();
+                    // 차트 영역 강제 제한
+                    const cvCanvas = document.getElementById('cvChart');
+                    if (cvCanvas) {
+                        cvCanvas.style.cssText += `
+                            max-width: 100% !important;
+                            max-height: 100% !important;
+                            position: relative !important;
+                        `;
+                    }
+                }
+                console.log('📐 차트 리사이즈 완료 - 완전한 2열 레이아웃 적용');
+            }, 200);
         }
-    });
+    }
 }
 
 console.log('PIMS 배치요약 통계 모듈이 로드되었습니다.'); 

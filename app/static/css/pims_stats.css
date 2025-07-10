@@ -144,4 +144,155 @@
     background: var(--stats-primary-color) !important;
     border-color: var(--stats-primary-color) !important;
     color: white !important;
+}
+
+/* ========================================
+   차트 레이아웃 스타일
+======================================== */
+
+/* 차트 버튼 스타일 개선 */
+#chartGenerateBtn {
+    background: #214293;
+    color: white;
+    border: none;
+    box-shadow: 0 2px 4px rgba(33, 66, 147, 0.3);
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    border-radius: 6px;
+}
+
+#chartGenerateBtn:hover {
+    background: #1a3575;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(33, 66, 147, 0.4);
+}
+
+#chartGenerateBtn:disabled {
+    background: #6c757d;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 차트 그리드 컨테이너 */
+.chart-grid-container {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 15px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+}
+
+/* 차트 개별 컬럼 */
+.chart-col-1, .chart-col-2 {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    flex: none !important;
+}
+
+/* 차트 카드 스타일 */
+.chart-grid-container .card {
+    height: 500px !important;
+    margin: 0 !important;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.chart-grid-container .card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 차트 카드 헤더 */
+.chart-grid-container .card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 2px solid #dee2e6;
+    padding: 12px 16px;
+}
+
+/* 차트 카드 바디 */
+.chart-grid-container .card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 차트 컨테이너 */
+.chart-grid-container .chart-container {
+    position: relative !important;
+    height: 380px !important;
+    width: 100% !important;
+    flex: 1;
+    overflow: hidden !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 4px !important;
+}
+
+/* 차트 캔버스 강제 제한 및 클리핑 */
+.chart-grid-container .chart-container canvas {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    max-width: calc(100% - 2px) !important;
+    max-height: calc(100% - 2px) !important;
+    width: calc(100% - 2px) !important;
+    height: calc(100% - 2px) !important;
+    object-fit: contain !important;
+    clip-path: inset(0) !important;
+    /* 차트 영역 밖 요소들을 완전히 숨김 */
+    -webkit-clip-path: inset(0 0 0 0) !important;
+    clip: rect(0, 100%, 100%, 0) !important;
+}
+
+/* 변수 선택 드롭다운 */
+.chart-grid-container #variableSelect {
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.3s ease;
+}
+
+.chart-grid-container #variableSelect:focus {
+    border-color: var(--stats-info-color);
+    box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+}
+
+/* CV 안내 박스 스타일 */
+.chart-grid-container .alert-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    border-left: 4px solid var(--stats-info-color);
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+/* 반응형 차트 레이아웃 */
+@media (max-width: 992px) {
+    .chart-grid-container {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+    
+    .chart-grid-container .card {
+        height: 450px !important;
+    }
+    
+    .chart-grid-container .chart-container {
+        height: 320px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #chartButtonContainer {
+        justify-content: center !important;
+    }
+    
+    .chart-grid-container .card {
+        height: 400px !important;
+    }
+    
+    .chart-grid-container .chart-container {
+        height: 280px !important;
+    }
 } 
