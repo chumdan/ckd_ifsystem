@@ -1,32 +1,32 @@
 {% extends "base.html" %}
 
-{% block title %}PIMS: 공정정보 조회 시스템{% endblock %}
+{% block title %}PIMS: 배치요약 시스템{% endblock %}
 
 {% block content %}
-<!-- PIMS 공정정보 조회 시스템 메인 페이지 -->
+<!-- PIMS 배치요약 시스템 메인 페이지 -->
 <div class="container-fluid">
     <!-- 페이지 제목 -->
     <div class="row mb-3">
         <div class="col-12">
             <h2 class="page-title simple-title">
-                <i class="fas fa-database me-2"></i>
-                PIMS: 공정정보 조회 시스템
+                <i class="fas fa-chart-bar me-2"></i>
+                PIMS: 배치요약 시스템
             </h2>
             <hr>
         </div>
     </div>
 
-    <!-- 1번 기능: PIMS 공정정보 DATA 조회 -->
+    <!-- 1번 기능: PIMS 배치요약 DATA 조회 -->
     <div class="row mb-4">
         <div class="col-12">
             <!-- 섹션 제목 -->
             <div class="card shadow-ckd">
                 <div class="card-header section-header">
                     <h5 class="mb-0">
-                        <i class="fas fa-search me-2"></i>
-                        1. PIMS: 공정정보 DATA 조회
+                        <i class="fas fa-chart-line me-2"></i>
+                        1. PIMS: 배치요약 DATA 조회
                     </h5>
-                    <small class="text-black-50">배치를 선택하여 공정 데이터를 조회합니다</small>
+                    <small class="text-black-50">배치별 통계량을 조회합니다 (평균, 표준편차, 25%, 50%, 75%)</small>
                 </div>
                 <div class="card-body">
                     <!-- 조회 폼 (가로 배치) -->
@@ -98,16 +98,16 @@
                                 <div class="form-text">공정을 선택하세요</div>
                             </div>
 
-                            <!-- 시간 설정 안내 -->
+                            <!-- 통계 처리 안내 -->
                             <div class="col-md-4">
                                 <label class="form-label">
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    시간 설정 안내
+                                    <i class="fas fa-chart-bar me-1"></i>
+                                    통계 처리 안내
                                 </label>
                                 <div class="alert alert-info py-2 mb-0">
                                     <small>
-                                        <strong>배치 1개:</strong> 단일 시간 설정<br>
-                                        <strong>배치 여러개:</strong> 배치별 개별 시간 설정
+                                        <strong>배치당 1행:</strong> 평균, 표준편차, 분위수<br>
+                                        <strong>대용량 데이터:</strong> 3,000~10,000건 → 5개 통계량
                                     </small>
                                 </div>
                             </div>
@@ -116,10 +116,10 @@
                             <div class="col-md-1">
                                 <label class="form-label">&nbsp;</label>
                                 <button type="submit" 
-                                        class="btn btn-success btn-lg w-100 d-block" 
-                                        id="searchBtn1">
-                                    <i class="fas fa-search me-1"></i>
-                                    데이터 조회
+                                        class="btn btn-primary btn-lg w-100 d-block" 
+                                        id="searchBtnStats">
+                                    <i class="fas fa-chart-line me-1"></i>
+                                    통계 조회
                                 </button>
                                 <div class="form-text">&nbsp;</div>
                             </div>
@@ -129,7 +129,7 @@
                     <!-- 시간 설정 섹션들 -->
                     <div class="mt-4">
                         <!-- 단일/공통 시간 설정 섹션 -->
-                        <div id="singleTimeSection" class="time-section">
+                        <div id="singleTimeSection1" class="time-section">
                             <div class="row g-3">
                                 <div class="col-md-3">
                                     <label for="startTime1" class="form-label">
@@ -155,9 +155,9 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="alert alert-warning py-2 mt-4">
-                                        <i class="fas fa-clock me-2"></i>
+                                        <i class="fas fa-calculator me-2"></i>
                                         <small>
-                                            <strong>PIMS 빅데이터 조회 및 다운로드 시 다소 시간이 소요될 수 있습니다.</strong>
+                                            <strong>통계 처리 중입니다. 배치당 수천 건의 데이터를 5개 통계량으로 압축합니다.</strong>
                                         </small>
                                     </div>
                                 </div>
@@ -165,38 +165,105 @@
                         </div>
 
                         <!-- 배치별 개별 시간 설정 섹션 -->
-                        <div id="multipleTimeSection" class="time-section d-none">
+                        <div id="multipleTimeSection1" class="time-section d-none">
                             <div class="alert alert-info">
                                 <i class="fas fa-info-circle me-2"></i>
                                 배치별로 개별 시간을 설정할 수 있습니다.
                             </div>
-                            <div id="batchTimeContainer">
+                            <div id="batchTimeContainer1">
                                 <!-- 동적으로 생성되는 배치별 시간 필드들 -->
                             </div>
                             <div class="alert alert-warning py-2 mt-3">
-                                <i class="fas fa-clock me-2"></i>
-                                <small><strong>PIMS 빅데이터 조회 시 시간이 다소 소요될 수 있습니다.</strong></small>
+                                <i class="fas fa-calculator me-2"></i>
+                                <small><strong>배치별 통계 처리 중입니다. 각 배치당 1행의 요약 데이터가 생성됩니다.</strong></small>
                             </div>
                         </div>
                     </div>
 
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- 조회 결과 영역 (나중에 구현) -->
+    <!-- 조회 결과 영역 -->
     <div class="row">
         <div class="col-12">
-            <div id="resultContainer1" class="d-none">
-                <!-- 여기에 조회 결과 테이블이 표시됩니다 -->
-                <div class="card shadow-ckd">
-                    <div class="card-header bg-success text-white">
-                        <h6 class="mb-0">
-                            <i class="fas fa-table me-2"></i>
-                            조회 결과
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-center text-muted">
-                            조회 결과가 여기에 표시됩니다
-                        </p>
+            <div id="resultContainerStats" style="display: none;">
+                <!-- 배치요약 결과 테이블 (기존 PIMS와 동일한 구조) -->
+                <div id="statsTableContainer">
+                    <!-- 동적으로 생성됩니다 (JavaScript에서 기존 PIMS와 동일한 구조로) -->
+                </div>
+                
+                <!-- 차트 분석 영역 -->
+                <div id="chartAnalysisContainer" style="display: none;">
+                    <div class="card shadow-ckd mt-4">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-chart-line me-2"></i>
+                                📈 배치별 트렌드 분석 및 공정 안정성 평가
+                            </h6>
+                            <small class="text-white-50">배치 간 변수 변화 추이와 각 변수의 안정성을 분석합니다</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- 왼쪽: 트렌드 차트 -->
+                                <div class="col-md-6">
+                                    <div class="card border-primary">
+                                        <div class="card-header bg-light">
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-chart-line me-2"></i>
+                                                배치별 트렌드 차트
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- 변수 선택 드롭다운 -->
+                                            <div class="mb-3">
+                                                <label for="variableSelect" class="form-label">
+                                                    <i class="fas fa-cogs me-1"></i>
+                                                    분석할 변수 선택
+                                                </label>
+                                                <select class="form-select" id="variableSelect">
+                                                    <option value="">변수를 선택하세요</option>
+                                                </select>
+                                                <div class="form-text">X축: 배치번호, Y축: 선택된 변수의 평균값</div>
+                                            </div>
+                                            
+                                            <!-- 트렌드 차트 캔버스 -->
+                                            <div class="chart-container" style="position: relative; height: 400px;">
+                                                <canvas id="trendChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 오른쪽: 변동계수(CV) 차트 -->
+                                <div class="col-md-6">
+                                    <div class="card border-success">
+                                        <div class="card-header bg-light">
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-chart-bar me-2"></i>
+                                                공정 안정성 평가 (변동계수)
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- 안정성 설명 -->
+                                            <div class="alert alert-info py-2 mb-3">
+                                                <small>
+                                                    <i class="fas fa-info-circle me-1"></i>
+                                                    <strong>변동계수(CV)</strong> = (표준편차 ÷ 평균) × 100<br>
+                                                    <strong>낮을수록</strong> = 안정적인 공정관리
+                                                </small>
+                                            </div>
+                                            
+                                            <!-- CV 차트 캔버스 -->
+                                            <div class="chart-container" style="position: relative; height: 400px;">
+                                                <canvas id="cvChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -206,10 +273,13 @@
 {% endblock %}
 
 {% block extra_css %}
-<!-- PIMS 페이지 전용 CSS는 pims.css 파일에서 로드됩니다 -->
+<!-- PIMS 배치요약 페이지 전용 CSS -->
+<link rel="stylesheet" href="{{ url_for('static', path='css/pims_stats.css') }}">
 {% endblock %}
 
 {% block extra_js %}
-<!-- PIMS 페이지 전용 JavaScript -->
+<!-- PIMS 기본 조회 기능 JavaScript (기존 기능 재사용) -->
 <script src="{{ url_for('static', path='js/pims.js') }}"></script>
-{% endblock %}
+<!-- PIMS 배치요약 통계 기능 JavaScript (추가 기능만) -->
+<script src="{{ url_for('static', path='js/pims_stats.js') }}"></script>
+{% endblock %} 

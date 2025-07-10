@@ -891,42 +891,48 @@ function updateBatchTimeContainer(batches) {
 }
 
 /**
- * 개별 배치 시간 설정 카드 생성
+ * 개별 배치 시간 설정 카드 생성 (예쁜 카드 스타일)
  * @param {string} batchNo - 배치 번호
  * @returns {HTMLElement} 생성된 카드 요소
  */
 function createBatchTimeCard(batchNo) {
     const cardDiv = document.createElement('div');
-    cardDiv.className = 'batch-time-card';
+    cardDiv.className = 'batch-time-card mb-3';
     cardDiv.setAttribute('data-batch', batchNo);
     
     cardDiv.innerHTML = `
-        <h6>
-            <span class="badge">${batchNo}</span>
-            배치별 시간 설정
-        </h6>
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label for="batchStart_${batchNo}" class="form-label">
-                    <i class="fas fa-play me-1"></i>
-                    시작시간
-                </label>
-                <input type="datetime-local" 
-                       class="form-control time-input" 
-                       id="batchStart_${batchNo}" 
-                       name="batch_start_${batchNo}">
-                <div class="form-text">${batchNo} 배치 시작시간</div>
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">
+                    <span class="badge bg-primary">${batchNo}</span>
+                    배치별 시간 설정
+                </h6>
             </div>
-            <div class="col-md-6">
-                <label for="batchEnd_${batchNo}" class="form-label">
-                    <i class="fas fa-stop me-1"></i>
-                    종료시간
-                </label>
-                <input type="datetime-local" 
-                       class="form-control time-input" 
-                       id="batchEnd_${batchNo}" 
-                       name="batch_end_${batchNo}">
-                <div class="form-text">${batchNo} 배치 종료시간</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="batchStart_${batchNo}" class="form-label">
+                            <i class="fas fa-play me-1"></i>
+                            시작시간
+                        </label>
+                        <input type="datetime-local" 
+                               class="form-control time-input" 
+                               id="batchStart_${batchNo}" 
+                               name="batch_start_${batchNo}">
+                        <div class="form-text">${batchNo} 배치 시작시간</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="batchEnd_${batchNo}" class="form-label">
+                            <i class="fas fa-stop me-1"></i>
+                            종료시간
+                        </label>
+                        <input type="datetime-local" 
+                               class="form-control time-input" 
+                               id="batchEnd_${batchNo}" 
+                               name="batch_end_${batchNo}">
+                        <div class="form-text">${batchNo} 배치 종료시간</div>
+                    </div>
+                </div>
             </div>
         </div>
     `;

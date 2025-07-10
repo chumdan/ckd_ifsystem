@@ -1,0 +1,147 @@
+/* ========================================
+   PIMS 배치요약 통계 페이지 전용 CSS
+======================================== */
+
+/* 통계 페이지 전용 색상 변수 */
+:root {
+    --stats-primary-color: #007bff;     /* 기본 파란색 */
+    --stats-success-color: #28a745;     /* 성공 녹색 */
+    --stats-info-color: #17a2b8;        /* 정보 청록색 */
+    --stats-warning-color: #ffc107;     /* 경고 노란색 */
+    --stats-danger-color: #dc3545;      /* 위험 빨간색 */
+}
+
+/* 통계 페이지 고유 스타일 */
+.stats-page {
+    background-color: #f8f9fa;
+}
+
+/* 통계 카드 헤더 스타일 */
+.stats-card-header {
+    background: linear-gradient(135deg, var(--stats-primary-color) 0%, #0056b3 100%);
+    color: white;
+    border-bottom: 3px solid #0056b3;
+}
+
+/* 통계 처리 안내 박스 */
+.stats-info-box {
+    background: linear-gradient(135deg, var(--stats-info-color) 0%, #138496 100%);
+    border-left: 4px solid #138496;
+}
+
+/* 통계 결과 테이블 커스터마이징 */
+.stats-table {
+    font-size: 0.9rem;
+}
+
+.stats-table th {
+    background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+    color: white;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap !important;
+}
+
+.stats-table td {
+    white-space: nowrap !important;
+    text-align: center;
+    vertical-align: middle;
+    word-wrap: normal !important;
+    word-break: keep-all !important;
+    text-overflow: clip !important;
+    overflow: visible !important;
+}
+
+/* 통계량별 색상 구분 (평균, 표준편차 등) */
+.stats-table td[data-stat="평균"] {
+    background-color: #e3f2fd;
+}
+
+.stats-table td[data-stat="표준편차"] {
+    background-color: #f3e5f5;
+}
+
+.stats-table td[data-stat="25%"] {
+    background-color: #e8f5e8;
+}
+
+.stats-table td[data-stat="50%"] {
+    background-color: #fff3e0;
+}
+
+.stats-table td[data-stat="75%"] {
+    background-color: #fce4ec;
+}
+
+/* 통계 버튼 스타일 */
+.stats-btn-primary {
+    background: linear-gradient(135deg, var(--stats-primary-color) 0%, #0056b3 100%);
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.stats-btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3 0%, #004494 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+}
+
+/* 배치별 시간 설정 카드 (기본 스타일 유지) */
+/* 이전의 심플한 디자인을 유지하므로 별도 스타일 불필요 */
+
+/* 통계 로딩 스피너 */
+.stats-loading {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid var(--stats-primary-color);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: stats-spin 1s linear infinite;
+}
+
+@keyframes stats-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .stats-table {
+        font-size: 0.8rem;
+    }
+}
+
+/* DataTables 커스터마이징 for 통계 페이지 */
+.dataTables_wrapper .dataTables_scroll .dataTables_scrollHead {
+    background: var(--stats-primary-color);
+}
+
+.dataTables_wrapper .dataTables_filter label {
+    color: var(--stats-primary-color);
+    font-weight: 600;
+}
+
+.dataTables_wrapper .dataTables_length label {
+    color: var(--stats-primary-color);
+    font-weight: 600;
+}
+
+.dataTables_wrapper .dataTables_info {
+    color: var(--stats-primary-color);
+    font-weight: 500;
+}
+
+/* 페이지네이션 스타일 */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: var(--stats-primary-color) !important;
+    border-color: var(--stats-primary-color) !important;
+    color: white !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: var(--stats-primary-color) !important;
+    border-color: var(--stats-primary-color) !important;
+    color: white !important;
+} 
