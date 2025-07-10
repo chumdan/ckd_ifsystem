@@ -414,3 +414,164 @@ def get_pims_data_l23(itemcode: str, batch_no: str, proc_code: str, start_time: 
             converted_results = filter_by_time_range(converted_results, start_time, end_time, tag_mapping)
     
     return converted_results
+
+
+def load_process_type_mapping() -> Dict[str, str]:
+    """
+    공정그룹.csv 파일을 읽어서 공정코드 → 공정타입 매핑 딕셔너리를 반환
+    
+    예: {'AB0': '과립', 'AH0': '타정', 'AI0': '코팅'}
+    
+    Returns:
+        Dict[str, str]: {공정코드: 공정타입} 형태의 딕셔너리
+    """
+    try:
+        # CSV 파일 경로 (app 폴더 안)
+        csv_path = os.path.join(os.path.dirname(__file__), '..', '공정그룹.csv')
+        
+        # CSV 파일 읽기 (한글 인코딩)
+        df = pd.read_csv(csv_path, encoding='utf-8')
+        
+        # 딕셔너리로 변환 (공정코드 → 공정타입)
+        process_type_mapping = dict(zip(df['공정코드'].str.strip(), df['공정타입'].str.strip()))
+        
+        print(f"📋 공정타입 매핑 로드 완료: {len(process_type_mapping)}개")
+        return process_type_mapping
+        
+    except Exception as e:
+        print(f"❌ 공정타입 매핑 로드 실패: {e}")
+        return {}
+
+
+def load_process_variable_mapping() -> Dict[str, List[str]]:
+    """
+    공정변수매핑.csv 파일을 읽어서 공정타입 → 변수목록 매핑 딕셔너리를 반환
+    
+    예: {'과립': ['L11_1110_FBG5_AIR_F', ...], '룸상태': ['L23_2526_REMS_T', ...]}
+    
+    Returns:
+        Dict[str, List[str]]: {공정타입: [변수명들]} 형태의 딕셔너리
+    """
+    try:
+        # CSV 파일 경로 (app 폴더 안)
+        csv_path = os.path.join(os.path.dirname(__file__), '..', '공정변수매핑.csv')
+        
+        # CSV 파일 읽기 (한글 인코딩)
+        df = pd.read_csv(csv_path, encoding='utf-8')
+        
+        # 공정타입별로 변수들을 그룹화
+        process_variable_mapping = {}
+        for process_type in df['공정타입'].unique():
+            # 해당 공정타입의 모든 변수들을 리스트로 수집
+            variables = df[df['공정타입'] == process_type]['변수명(영문)'].str.strip().tolist()
+            process_variable_mapping[process_type] = variables
+        
+        print(f"📋 공정변수 매핑 로드 완료: {len(process_variable_mapping)}개 공정타입")
+        
+        # 각 공정타입별 변수 개수 출력 (디버깅용)
+        for ptype, variables in process_variable_mapping.items():
+            print(f"  - {ptype}: {len(variables)}개 변수")
+            
+        return process_variable_mapping
+        
+    except Exception as e:
+        print(f"❌ 공정변수 매핑 로드 실패: {e}")
+        return {}
+
+
+def filter_data_by_process_type(data: List[Dict[str, Any]], proc_code: str) -> List[Dict[str, Any]]:
+    """
+    선택된 공정코드에 따라 관련 변수들만 필터링하는 함수
+    
+    📌 필터링 규칙:
+    1. 선택된 공정의 타입에 해당하는 변수들
+    2. 룸상태 변수들 (모든 공정에서 항상 표시)
+    3. 기본 시스템 변수들 (시간, 배치번호 등)
+    
+    Args:
+        data: 원본 PIMS 데이터 리스트 (한글 컬럼명으로 변환된 상태)
+        proc_code: 선택된 공정코드 (예: 'AB1', 'AH0')
+    
+    Returns:
+        List[Dict[str, Any]]: 필터링된 데이터 리스트
+    """
+    # 데이터가 없으면 그대로 반환
+    if not data:
+        print("⚠️  필터링할 데이터가 없습니다.")
+        return data
+    
+    print(f"🔍 공정코드 '{proc_code}'에 대한 데이터 필터링 시작...")
+    
+    # 1. 매핑 정보 로드
+    process_type_mapping = load_process_type_mapping()       # 공정코드 → 공정타입
+    process_variable_mapping = load_process_variable_mapping()  # 공정타입 → 변수목록
+    tag_mapping = load_tag_mapping()  # 영문 → 한글 변수명 매핑
+    
+    # 2. 선택된 공정의 타입 확인
+    process_type = process_type_mapping.get(proc_code, "")
+    
+    if not process_type:
+        print(f"⚠️  공정코드 '{proc_code}'의 타입을 찾을 수 없습니다. 필터링 안함.")
+        return data  # 필터링 없이 원본 데이터 반환
+    
+    print(f"✅ 공정코드 '{proc_code}' → 공정타입 '{process_type}'")
+    
+    # 3. 표시할 변수들 수집 (허용된 변수들의 집합) - 영문명으로 수집 후 한글명으로 변환
+    allowed_variables_eng = set()
+    
+    # 3-1. 선택된 공정타입의 변수들 추가
+    if process_type in process_variable_mapping:
+        type_variables = process_variable_mapping[process_type]
+        allowed_variables_eng.update(type_variables)
+        print(f"📊 '{process_type}' 공정변수: {len(type_variables)}개 추가")
+    
+    # 3-2. 룸상태 변수들 추가 (모든 공정에서 표시)
+    if "룸상태" in process_variable_mapping:
+        room_variables = process_variable_mapping["룸상태"]
+        allowed_variables_eng.update(room_variables)
+        print(f"🏠 룸상태 변수: {len(room_variables)}개 추가")
+    
+    # 3-3. 기본 시스템 변수들 추가 (항상 표시) - 영문명
+    basic_variables_eng = [
+        "AUFNR",           # 작업번호
+        "MATNR",           # 품목코드  
+        "CHARG",           # 배치번호
+        "ACT_START",       # 시작시각
+        "ACT_FINISH",      # 종료시각
+        "VORNR",           # 작업순서
+        "KTSCH",           # 공정코드
+        "ACT_FINISH_TIMS", # 총시간(초)
+        "STATUS3",         # 상태(X=종료)
+        "KTEXT",           # 설비정보
+        "ITIME"            # 시간
+    ]
+    allowed_variables_eng.update(basic_variables_eng)
+    print(f"⚙️  기본 시스템 변수: {len(basic_variables_eng)}개 추가")
+    
+    # 3-4. 영문명을 한글명으로 변환 (데이터는 이미 한글 컬럼명으로 변환된 상태)
+    allowed_variables_kor = set()
+    for eng_var in allowed_variables_eng:
+        kor_var = tag_mapping.get(eng_var, eng_var)  # 한글명이 없으면 영문명 그대로
+        allowed_variables_kor.add(kor_var)
+    
+    print(f"🎯 총 허용된 변수: {len(allowed_variables_kor)}개 (한글명 기준)")
+    
+    # 4. 데이터 필터링 실행
+    filtered_data = []
+    original_column_count = len(data[0].keys()) if data else 0
+    
+    for row in data:
+        # 새로운 행 생성 (허용된 변수들만 포함)
+        filtered_row = {}
+        for key, value in row.items():
+            if key in allowed_variables_kor:
+                filtered_row[key] = value
+        
+        filtered_data.append(filtered_row)
+    
+    # 5. 필터링 결과 출력
+    filtered_column_count = len(filtered_data[0].keys()) if filtered_data else 0
+    print(f"✅ 필터링 완료: {original_column_count}개 → {filtered_column_count}개 컬럼")
+    print(f"📈 데이터 행 수: {len(filtered_data)}건")
+    
+    return filtered_data

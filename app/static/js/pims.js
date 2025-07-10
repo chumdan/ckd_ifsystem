@@ -51,7 +51,7 @@ function setupEventListeners() {
         clearTimeout(itemCodeTimer);
         const itemCode = this.value.trim();
         
-        if (itemCode.length >= 6) { // 6글자 이상 입력했을 때만
+        if (itemCode.length >= 7) { // 6글자 이상 입력했을 때만
             itemCodeTimer = setTimeout(function() {
                 // 제품 타입이 선택되었는지 확인
                 const productType = document.getElementById('productType1').value;

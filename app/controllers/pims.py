@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 
-from app.services.pims_service import search_product, get_pims_data_basic, get_pims_data_l23, get_pims_data_with_batch_times
+from app.services.pims_service import search_product, get_pims_data_basic, get_pims_data_l23, get_pims_data_with_batch_times, filter_data_by_process_type
 
 # PIMS API 라우터 생성
 router = APIRouter(prefix="/api/pims", tags=["PIMS"])
@@ -168,6 +168,11 @@ async def api_get_data_basic(request: GetDataRequest):
                 limit=limit,
                 data_type="basic"
             )
+            
+            # 🆕 공정별 변수 필터링 적용 (배치별 시간 처리에도 적용)
+            if result and request.proc_code:
+                print(f"🔍 공정별 변수 필터링 적용 (배치별): {request.proc_code}")
+                result = filter_data_by_process_type(result, request.proc_code)
         else:
             # 공통 시간 또는 기존 방식
             start_time = request.start_time or ""
@@ -182,6 +187,11 @@ async def api_get_data_basic(request: GetDataRequest):
                 end_time=end_time,
                 limit=limit
             )
+        
+        # 🆕 공정별 변수 필터링 적용 (기존 기능 보존)
+        if result and request.proc_code:
+            print(f"🔍 공정별 변수 필터링 적용: {request.proc_code}")
+            result = filter_data_by_process_type(result, request.proc_code)
         
         # 성공 응답
         return {
@@ -263,6 +273,11 @@ async def api_get_data_l23(request: GetDataRequest):
                 limit=limit,
                 data_type="l23"
             )
+            
+            # 🆕 공정별 변수 필터링 적용 (배치별 시간 처리에도 적용)
+            if result and request.proc_code:
+                print(f"🔍 공정별 변수 필터링 적용 (배치별): {request.proc_code}")
+                result = filter_data_by_process_type(result, request.proc_code)
         else:
             # 공통 시간 또는 기존 방식
             start_time = request.start_time or ""
@@ -277,6 +292,11 @@ async def api_get_data_l23(request: GetDataRequest):
                 end_time=end_time,
                 limit=limit
             )
+        
+        # 🆕 공정별 변수 필터링 적용 (기존 기능 보존)
+        if result and request.proc_code:
+            print(f"🔍 공정별 변수 필터링 적용: {request.proc_code}")
+            result = filter_data_by_process_type(result, request.proc_code)
         
         # 성공 응답
         return {
