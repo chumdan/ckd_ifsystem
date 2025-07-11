@@ -858,15 +858,15 @@ function createOrderedStatsHeaders(sampleRow) {
  * 차트 분석 영역 표시 및 초기화
  */
 function showChartAnalysis(statsData) {
-    console.log('차트 분석 영역을 표시합니다.');
+    console.log('차트 분석 영역을 표시하고 자동으로 차트를 생성합니다.');
     
     // 차트 분석 영역 표시 (HTML ID와 매칭)
     const chartSection = document.getElementById('chartAnalysisContainer');
     if (chartSection) {
         chartSection.style.display = 'block';
         
-        // 차트 생성 버튼 추가 (테이블 아래)
-        addChartButton();
+        // 차트 바로 생성 (버튼 없이 자동으로)
+        generateChartsFromCachedData();
     }
 }
 
