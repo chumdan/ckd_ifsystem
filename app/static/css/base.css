@@ -154,17 +154,41 @@ body {
 /* ==================== 푸터 ==================== */
 
 .footer {
-    background-color: #343a40;
-    color: white;
-    text-align: center;
-    padding: 1.5rem 0;
     margin-top: auto;
 }
 
-.footer-text {
+/* 문의사항 띠 (밝은 회색) */
+.footer-contact {
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 0.8rem 0;
+    border-top: 1px solid #dee2e6;
+}
+
+.contact-text {
     margin-bottom: 0;
     font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.contact-text i {
+    margin-right: 0.5rem;
+    color: var(--ckd-primary);
+}
+
+/* 저작권 띠 (어두운 회색) */
+.footer-copyright {
+    background-color: #343a40;
+    color: white;
+    padding: 0.7rem 0;
+}
+
+.copyright-text {
+    margin-bottom: 0;
+    font-size: 0.8rem;
     opacity: 0.8;
+    line-height: 1.4;
 }
 
 /* ==================== 반응형 ==================== */

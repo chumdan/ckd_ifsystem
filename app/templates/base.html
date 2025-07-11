@@ -67,12 +67,29 @@
     <!-- 푸터 -->
     {% block footer %}
     <footer class="footer">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <p class="footer-text">
-                        &copy; {{ current_year if current_year else "2024" }} CKD Corporation. All rights reserved.
-                    </p>
+        <!-- 문의사항 띠 (밝은 회색) -->
+        <div class="footer-contact">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <p class="contact-text">
+                            <i class="fas fa-phone-alt"></i>
+                            문의사항은 정보기획팀 고동현 주임(내선:189)로 연락해주세요
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 저작권 띠 (어두운 회색) -->
+        <div class="footer-copyright">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <p class="copyright-text">
+                            &copy; {{ current_year if current_year else "2025" }} CKD Corporation. All rights reserved.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
