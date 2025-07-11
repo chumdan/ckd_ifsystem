@@ -13,9 +13,7 @@ const STATS_API_BASE_URL = '/api/pims-stats';
 // 통계 DataTables 객체
 let pimsStatsTable = null;
 
-// Chart.js 차트 객체들
-let trendChart = null;
-let cvChart = null;
+// Plotly 차트 변수들
 let currentChartData = null;  // 현재 차트 데이터 저장
 
 // ========================================
@@ -1086,7 +1084,7 @@ async function loadChartData() {
 }
 
 /**
- * 트렌드 차트 렌더링 (Chart.js 사용)
+ * 트렌드 차트 렌더링 (Plotly 사용)
  */
 function renderTrendChart() {
     if (!currentChartData || !currentChartData.variables.length) {
@@ -1103,16 +1101,14 @@ function renderTrendChart() {
 }
 
 /**
- * 트렌드 차트 업데이트 (변수 선택 시)
+ * 트렌드 차트 업데이트 (변수 선택 시) - Plotly 버전
  */
 function updateTrendChart(selectedVariable) {
-    const canvas = document.getElementById('trendChart');
-    if (!canvas) {
-        console.error('트렌드 차트 캔버스를 찾을 수 없습니다.');
+    const chartDiv = document.getElementById('trendChart');
+    if (!chartDiv) {
+        console.error('트렌드 차트 영역을 찾을 수 없습니다.');
         return;
     }
-    
-    const ctx = canvas.getContext('2d');
     
     if (!currentChartData.trend_data[selectedVariable]) {
         console.warn(`⚠️ ${selectedVariable} 변수의 트렌드 데이터가 없습니다.`);
@@ -1121,112 +1117,67 @@ function updateTrendChart(selectedVariable) {
     
     const trendData = currentChartData.trend_data[selectedVariable];
     
-    // 기존 차트 제거
-    if (trendChart) {
-        trendChart.destroy();
-    }
-    
-    // 새 차트 생성
-    trendChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: trendData.map(d => d.batch),
-            datasets: [{
-                label: `${selectedVariable} 평균값`,
-                data: trendData.map(d => d.value),
-                borderColor: '#007bff',
-                backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4,  // 부드러운 곡선
-                clip: { left: 0, top: 0, right: 0, bottom: 0 },  // 데이터셋 레벨에서 강제 클리핑
-                pointRadius: 3,
-                pointHoverRadius: 5
-            }]
+    // 📊 Plotly 데이터 준비
+    const plotData = [{
+        x: trendData.map(d => d.batch),
+        y: trendData.map(d => d.value),
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: `${selectedVariable} 평균값`,
+        line: {
+            color: '#007bff',
+            width: 3,
+            shape: 'spline'  // 부드러운 곡선
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,  // 2열 레이아웃을 위해 false
-            clip: { left: 0, top: 0, right: 0, bottom: 0 },  // 차트 영역에서 강제 클리핑 (여백 없음)
-            animation: {
-                duration: 0  // 애니메이션 완전 비활성화 (그래프 선이 밖에서 들어오는 현상 방지)
-            },
-            layout: {
-                padding: {
-                    top: 15,
-                    right: 15,
-                    bottom: 15,
-                    left: 15
-                }
-            },
-            elements: {
-                line: {
-                    tension: 0.4,
-                    borderWidth: 2
-                },
-                point: {
-                    radius: 3,
-                    hoverRadius: 5
-                }
-            },
-            plugins: {
-                title: {
-                    display: true,
-                    text: `${selectedVariable} 배치별 트렌드`,
-                    font: {
-                        size: 14,
-                        weight: 'bold'
-                    }
-                },
-                legend: {
-                    display: true,
-                    position: 'top'
-                }
-            },
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: '배치번호'
-                    },
-                    ticks: {
-                        maxRotation: 90,  // X축 라벨 90도 회전
-                        minRotation: 90,
-                        font: {
-                            size: 10
-                        }
-                    },
-                    grid: {
-                        display: true,
-                        drawBorder: true,
-                        borderWidth: 2
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: '평균값'
-                    },
-                    beginAtZero: false,
-                    grid: {
-                        display: true,
-                        drawBorder: true,
-                        borderWidth: 2
-                    }
-                }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index'
+        marker: {
+            color: '#007bff',
+            size: 6,
+            line: {
+                color: '#ffffff',
+                width: 1
             }
-        }
-    });
+        },
+        fill: 'tonexty',
+        fillcolor: 'rgba(0, 123, 255, 0.1)'
+    }];
     
-    console.log(`📈 ${selectedVariable} 트렌드 차트 렌더링 완료`);
+    // 📊 Plotly 레이아웃 설정
+    const layout = {
+        title: {
+            text: `${selectedVariable} 배치별 트렌드`,
+            font: { size: 14, color: '#333' }
+        },
+        xaxis: {
+            title: '배치번호',
+            tickangle: -45,
+            showgrid: true,
+            gridcolor: '#e6e6e6'
+        },
+        yaxis: {
+            title: '평균값',
+            showgrid: true,
+            gridcolor: '#e6e6e6'
+        },
+        margin: { t: 50, r: 30, b: 80, l: 60 },
+        showlegend: false,
+        plot_bgcolor: '#fafafa',
+        paper_bgcolor: '#ffffff'
+    };
+    
+    // 📊 Plotly 설정
+    const config = {
+        responsive: true,
+        displayModeBar: false  // 툴바 숨기기
+    };
+    
+    // 🚀 Plotly 차트 생성 (매우 간단!)
+    Plotly.newPlot(chartDiv, plotData, layout, config);
+    
+    console.log(`📈 ${selectedVariable} 트렌드 차트 렌더링 완료 (Plotly)`);
 }
 
 /**
- * CV 차트 렌더링
+ * CV 차트 렌더링 - Plotly 버전
  */
 function renderCvChart() {
     if (!currentChartData || !currentChartData.cv_data.length) {
@@ -1234,109 +1185,71 @@ function renderCvChart() {
         return;
     }
     
-    const canvas = document.getElementById('cvChart');
-    if (!canvas) {
-        console.error('CV 차트 캔버스를 찾을 수 없습니다.');
+    const chartDiv = document.getElementById('cvChart');
+    if (!chartDiv) {
+        console.error('CV 차트 영역을 찾을 수 없습니다.');
         return;
-    }
-    
-    const ctx = canvas.getContext('2d');
-    
-    // 기존 차트 제거
-    if (cvChart) {
-        cvChart.destroy();
     }
     
     const cvData = currentChartData.cv_data;
     
-    // 새 차트 생성
-    cvChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: cvData.map(d => d.variable),
-            datasets: [{
-                label: '변동계수 (%)',
-                data: cvData.map(d => d.cv),
-                backgroundColor: cvData.map(d => {
-                    if (d.cv < 5) return '#28a745';      // 낮음 (안정) - 초록
-                    if (d.cv < 15) return '#ffc107';     // 보통 - 노랑
-                    return '#dc3545';                    // 높음 (불안정) - 빨강
-                }),
-                borderColor: cvData.map(d => {
-                    if (d.cv < 5) return '#1e7e34';      
-                    if (d.cv < 15) return '#e0a800';     
-                    return '#c82333';                    
-                }),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,  // 2열 레이아웃을 위해 false
-            clip: { left: 0, top: 0, right: 0, bottom: 0 },  // 차트 영역에서 강제 클리핑 (여백 없음)
-            animation: {
-                duration: 0  // 애니메이션 완전 비활성화 (그래프 선이 밖에서 들어오는 현상 방지)
-            },
-            layout: {
-                padding: {
-                    top: 15,
-                    right: 15,
-                    bottom: 15,
-                    left: 15
-                }
-            },
-            plugins: {
-                title: {
-                    display: true,
-                    text: '공정 안정성 평가 (변동계수)',
-                    font: {
-                        size: 14,
-                        weight: 'bold'
-                    }
-                },
-                legend: {
-                    display: true,
-                    position: 'top'
-                }
-            },
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: '변수명'
-                    },
-                    ticks: {
-                        maxRotation: 90,  // X축 라벨 90도 회전
-                        minRotation: 90,
-                        font: {
-                            size: 10
-                        }
-                    },
-                    grid: {
-                        display: true,
-                        drawBorder: true
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: '변동계수 (%)'
-                    },
-                    beginAtZero: true,
-                    grid: {
-                        display: true,
-                        drawBorder: true
-                    }
-                }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index'
-            }
-        }
+    // 📊 CV 값에 따른 색상 결정
+    const colors = cvData.map(d => {
+        if (d.cv < 5) return '#28a745';      // 낮음 (안정) - 초록
+        if (d.cv < 15) return '#ffc107';     // 보통 - 노랑
+        return '#dc3545';                    // 높음 (불안정) - 빨강
     });
     
-    console.log('📊 CV 차트 렌더링 완료');
+    // 📊 Plotly 데이터 준비
+    const plotData = [{
+        x: cvData.map(d => d.variable),
+        y: cvData.map(d => d.cv),
+        type: 'bar',
+        name: '변동계수 (%)',
+        marker: {
+            color: colors,
+            line: {
+                color: colors.map(c => c === '#28a745' ? '#1e7e34' : c === '#ffc107' ? '#e0a800' : '#c82333'),
+                width: 1
+            }
+        },
+        text: cvData.map(d => `${d.cv.toFixed(1)}%`),
+        textposition: 'outside'
+    }];
+    
+    // 📊 Plotly 레이아웃 설정
+    const layout = {
+        title: {
+            text: '공정 안정성 평가 (변동계수)',
+            font: { size: 14, color: '#333' }
+        },
+        xaxis: {
+            title: '변수명',
+            tickangle: -45,
+            showgrid: false
+        },
+        yaxis: {
+            title: '변동계수 (%)',
+            showgrid: true,
+            gridcolor: '#e6e6e6',
+            zeroline: true
+        },
+        margin: { t: 50, r: 30, b: 100, l: 60 },
+        showlegend: false,
+        plot_bgcolor: '#fafafa',
+        paper_bgcolor: '#ffffff'
+    };
+    
+    // 📊 Plotly 설정
+    const config = {
+        responsive: true,
+        displayModeBar: false  // 툴바 숨기기
+    };
+    
+    // 🚀 Plotly 차트 생성 (매우 간단!)
+    Plotly.newPlot(chartDiv, plotData, layout, config);
+    
+    console.log('📊 CV 차트 렌더링 완료 (Plotly)');
 }
 
 /**
@@ -1389,7 +1302,7 @@ function showChartLoading(show) {
 }
 
 /**
- * 차트 컨테이너 표시/숨기기
+ * 차트 컨테이너 표시/숨기기 - Plotly 버전 (매우 간단!)
  */
 function showChartContainer(show) {
     // 전체 차트 영역 표시
@@ -1398,86 +1311,8 @@ function showChartContainer(show) {
         chartSection.style.display = show ? 'block' : 'none';
     }
     
-    // 2열 레이아웃 강제 적용 (완전한 CSS Grid)
-    if (show) {
-        const chartRow = chartSection?.querySelector('.row');
-        if (chartRow) {
-            // Bootstrap 클래스 제거하고 완전히 CSS Grid로 대체
-            chartRow.className = 'chart-grid-container';
-            chartRow.style.cssText = `
-                display: grid !important;
-                grid-template-columns: 1fr 1fr !important;
-                gap: 15px !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                width: 100% !important;
-            `;
-            
-            // 개별 컬럼 스타일 (Bootstrap col-md-6 클래스 무시)
-            const chartCols = chartRow.querySelectorAll('.col-md-6');
-            chartCols.forEach((col, index) => {
-                col.className = `chart-col-${index + 1}`;
-                col.style.cssText = `
-                    margin: 0 !important;
-                    padding: 0 !important;
-                    width: 100% !important;
-                    max-width: none !important;
-                    flex: none !important;
-                `;
-                
-                // 카드 스타일도 조정
-                const card = col.querySelector('.card');
-                if (card) {
-                    card.style.cssText = `
-                        height: 500px !important;
-                        margin: 0 !important;
-                    `;
-                }
-                
-                // 차트 컨테이너 스타일
-                const chartContainer = col.querySelector('.chart-container');
-                if (chartContainer) {
-                    chartContainer.style.cssText = `
-                        position: relative !important;
-                        height: 380px !important;
-                        width: 100% !important;
-                        overflow: hidden !important;
-                        border: 1px solid #dee2e6 !important;
-                        border-radius: 4px !important;
-                    `;
-                }
-            });
-            
-            // 차트 리사이즈 (레이아웃 적용 후)
-            setTimeout(() => {
-                if (trendChart) {
-                    trendChart.resize();
-                    // 차트 영역 강제 제한
-                    const trendCanvas = document.getElementById('trendChart');
-                    if (trendCanvas) {
-                        trendCanvas.style.cssText += `
-                            max-width: 100% !important;
-                            max-height: 100% !important;
-                            position: relative !important;
-                        `;
-                    }
-                }
-                if (cvChart) {
-                    cvChart.resize();
-                    // 차트 영역 강제 제한
-                    const cvCanvas = document.getElementById('cvChart');
-                    if (cvCanvas) {
-                        cvCanvas.style.cssText += `
-                            max-width: 100% !important;
-                            max-height: 100% !important;
-                            position: relative !important;
-                        `;
-                    }
-                }
-                console.log('📐 차트 리사이즈 완료 - 완전한 2열 레이아웃 적용');
-            }, 200);
-        }
-    }
+    // Plotly는 자동으로 반응형이므로 복잡한 설정 불필요! 🚀
+    console.log(`📊 차트 컨테이너 ${show ? '표시' : '숨김'} (Plotly 자동 반응형)`);
 }
 
 console.log('PIMS 배치요약 통계 모듈이 로드되었습니다.'); 

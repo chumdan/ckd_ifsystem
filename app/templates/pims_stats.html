@@ -228,9 +228,9 @@
                                                 <div class="form-text">X축: 배치번호, Y축: 선택된 변수의 평균값</div>
                                             </div>
                                             
-                                            <!-- 트렌드 차트 캔버스 -->
-                                            <div class="chart-container" style="position: relative; height: 400px;">
-                                                <canvas id="trendChart"></canvas>
+                                            <!-- 트렌드 차트 영역 -->
+                                            <div class="chart-container">
+                                                <div id="trendChart"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -255,9 +255,9 @@
                                                 </small>
                                             </div>
                                             
-                                            <!-- CV 차트 캔버스 -->
-                                            <div class="chart-container" style="position: relative; height: 400px;">
-                                                <canvas id="cvChart"></canvas>
+                                            <!-- CV 차트 영역 -->
+                                            <div class="chart-container">
+                                                <div id="cvChart"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -278,8 +278,10 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Plotly.js - 이 페이지에서만 사용 -->
+<script src="{{ url_for('static', path='js/plotly.min.js') }}"></script>
 <!-- PIMS 기본 조회 기능 JavaScript (기존 기능 재사용) -->
 <script src="{{ url_for('static', path='js/pims.js') }}"></script>
 <!-- PIMS 배치요약 통계 기능 JavaScript (추가 기능만) -->
-<script src="{{ url_for('static', path='js/pims_stats.js') }}"></script>
+<script src="{{ url_for('static', path='js/pims_stats.js') }}?v={{ range(1, 1000) | random }}"></script>
 {% endblock %} 
