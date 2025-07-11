@@ -1149,16 +1149,18 @@ function updateTrendChart(selectedVariable) {
         },
         xaxis: {
             title: '배치번호',
-            tickangle: -45,
+            tickangle: -90,  // X축 틱을 90도로 회전
+            automargin: true,  // 자동 마진 조정
             showgrid: true,
             gridcolor: '#e6e6e6'
         },
         yaxis: {
             title: '평균값',
+            automargin: true,  // 자동 마진 조정
             showgrid: true,
             gridcolor: '#e6e6e6'
         },
-        margin: { t: 50, r: 30, b: 80, l: 60 },
+        autosize: true,  // 컨테이너 크기에 자동 맞춤
         showlegend: false,
         plot_bgcolor: '#fafafa',
         paper_bgcolor: '#ffffff'
@@ -1225,16 +1227,18 @@ function renderCvChart() {
         },
         xaxis: {
             title: '변수명',
-            tickangle: -45,
+            tickangle: -90,  // X축 틱을 90도로 회전
+            automargin: true,  // 자동 마진 조정
             showgrid: false
         },
         yaxis: {
             title: '변동계수 (%)',
+            automargin: true,  // 자동 마진 조정
             showgrid: true,
             gridcolor: '#e6e6e6',
             zeroline: true
         },
-        margin: { t: 50, r: 30, b: 100, l: 60 },
+        autosize: true,  // 컨테이너 크기에 자동 맞춤
         showlegend: false,
         plot_bgcolor: '#fafafa',
         paper_bgcolor: '#ffffff'
