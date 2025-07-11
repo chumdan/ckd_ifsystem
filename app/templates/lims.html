@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block title %}LIMS: 실험결과 시스템{% endblock %}
+
+{% block content %}
+<!-- LIMS 실험결과 시스템 메인 페이지 -->
+<div class="container-fluid">
+    <!-- 페이지 제목 -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2 class="page-title simple-title">
+                <i class="fas fa-flask me-2"></i>
+                LIMS: 실험결과 시스템
+            </h2>
+            <hr>
+        </div>
+    </div>
+
+
+
+    <!-- 1번 기능: LIMS 실험결과 DATA 조회 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <!-- 섹션 제목 -->
+            <div class="card shadow-ckd">
+                <div class="card-header section-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        1. LIMS: 실험결과 DATA 조회
+                    </h5>
+                    <small class="text-black-50">LIMS 실험결과를 조회합니다.</small>
+                </div>
+                <div class="card-body">
+                    <!-- 조회 폼 (가로 배치) -->
+                    <form id="limsDataForm">
+                        <div class="row g-3 align-items-center">
+                            <!-- 품목코드 입력 -->
+                            <div class="col-md-2">
+                                <label for="itemCode1" class="form-label">
+                                    <i class="fas fa-barcode me-1"></i>
+                                    품목코드 <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="itemCode1" 
+                                       name="itemcode"
+                                       placeholder="예: 029124A" 
+                                       required>
+                                <div class="form-text">품목 코드를 입력하세요</div>
+                            </div>
+
+                            <!-- 배치 선택 -->
+                            <div class="col-md-3">
+                                <label for="batchSelect1" class="form-label">
+                                    <i class="fas fa-list me-1"></i>
+                                    배치 선택 <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" 
+                                        id="batchSelect1" 
+                                        name="batch_no"
+                                        multiple
+                                        size="3"
+                                        required 
+                                        disabled>
+                                    <option value="">품목코드 입력 후 선택</option>
+                                </select>
+                                <div class="form-text">Ctrl+클릭으로 다중선택</div>
+                            </div>
+
+                            <!-- 공정 선택 -->
+                            <div class="col-md-2">
+                                <label for="processSelect1" class="form-label">
+                                    <i class="fas fa-cogs me-1"></i>
+                                    공정 선택 <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" 
+                                        id="processSelect1" 
+                                        name="proc_code"
+                                        required 
+                                        disabled>
+                                    <option value="">배치 선택 후 선택</option>
+                                </select>
+                                <div class="form-text">공정을 선택하세요</div>
+                            </div>
+
+                            <!-- LIMS 실험결과 안내 -->
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    <i class="fas fa-flask me-1"></i>
+                                    LIMS 데이터 안내
+                                </label>
+                                <div class="alert alert-info py-2 mb-0">
+                                    <small>
+                                        <strong>원본 실험데이터:</strong> 개별 시험 결과를 그대로 표시<br>
+                                        <strong>실험값 분석:</strong> 숫자형 측정값만 차트로 분석 가능
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- 조회 버튼 -->
+                            <div class="col-md-1">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" 
+                                        class="btn btn-primary btn-lg w-100 d-block" 
+                                        id="searchBtnStats">
+                                    <i class="fas fa-flask me-1"></i>
+                                    실험결과 조회
+                                </button>
+                                <div class="form-text">&nbsp;</div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- 간단한 안내 -->
+                    <div class="mt-3">
+                        <div class="alert alert-info py-2">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <small>
+                                <strong>LIMS 실험결과 특징:</strong> 
+                                시간 정보 없이 개별 실험 결과를 원본 그대로 제공합니다. 
+                                모든 제품 타입이 통합 조회되며, 숫자형 실험값은 차트 분석이 가능합니다.
+                            </small>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 조회 결과 영역 -->
+    <div class="row">
+        <div class="col-12">
+            <div id="resultContainerStats" style="display: none;">
+                <!-- LIMS 실험결과 테이블 -->
+                <div id="statsTableContainer">
+                    <!-- 동적으로 생성됩니다 (JavaScript에서 PIMS와 동일한 구조로) -->
+                </div>
+                
+                <!-- 차트 분석 영역 -->
+                <div id="chartAnalysisContainer" style="display: none;">
+                    <div class="card shadow-ckd mt-4">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-chart-line me-2"></i>
+                                📈 배치별 실험결과 분석 및 공정 안정성 평가
+                            </h6>
+                            <small class="text-white-50">배치 간 실험값 변화 추이와 각 항목의 안정성을 분석합니다</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- 트렌드 차트 -->
+                                <div class="col-12 mb-4">
+                                    <div class="card border-primary">
+                                        <div class="card-header bg-light">
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-chart-line me-2"></i>
+                                                배치별 트렌드 차트
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- 실험항목 선택 드롭다운 -->
+                                            <div class="mb-3">
+                                                <label for="chartVariableSelect1" class="form-label">
+                                                    <i class="fas fa-cogs me-1"></i>
+                                                    분석할 실험항목 선택
+                                                </label>
+                                                <select class="form-select" id="chartVariableSelect1">
+                                                    <option value="">실험항목을 선택하세요</option>
+                                                </select>
+                                                <div class="form-text">X축: 배치번호, Y축: 선택된 실험항목의 측정값</div>
+                                            </div>
+                                            
+                                            <!-- 트렌드 차트 영역 -->
+                                            <div class="chart-container">
+                                                <div id="trendChart1"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 변동계수(CV) 차트 -->
+                                <div class="col-12">
+                                    <div class="card border-success">
+                                        <div class="card-header bg-light">
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-chart-bar me-2"></i>
+                                                공정 안정성 평가 (변동계수)
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- 안정성 설명 -->
+                                            <div class="alert alert-info py-2 mb-3">
+                                                <small>
+                                                    <i class="fas fa-info-circle me-1"></i>
+                                                    <strong>변동계수(CV)</strong> = (표준편차 ÷ 평균) × 100<br>
+                                                    <strong>낮을수록</strong> = 안정적인 공정관리
+                                                </small>
+                                            </div>
+
+                                            <!-- 색상 의미 설명 -->
+                                            <div class="row mb-3">
+                                                <div class="col-md-8">
+                                                    <div class="alert alert-light border py-2 mb-0">
+                                                        <small>
+                                                            <strong>📊 안정성 평가 기준:</strong><br>
+                                                            <span class="badge bg-success me-2">🟢 안정 (CV &lt; 5%)</span>
+                                                            <span class="badge bg-warning text-dark me-2">🟡 보통 (5% ≤ CV &lt; 15%)</span>
+                                                            <span class="badge bg-danger">🔴 위험 (CV ≥ 15%)</span>
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 text-end">
+                                                    <button type="button" class="btn btn-outline-primary btn-sm" id="downloadCvBtn1">
+                                                        <i class="fas fa-download me-1"></i>
+                                                        CV 결과 다운로드
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- CV 차트 영역 -->
+                                            <div class="chart-container">
+                                                <div id="cvChart1"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 품질예측시스템 안내 메시지 -->
+                <div class="card border-warning mt-4">
+                    <div class="card-body bg-warning bg-opacity-10">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-chart-line text-warning fa-2x"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 text-warning">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    더 자세한 분석이 필요하신가요?
+                                </h6>
+                                <p class="mb-0 small">
+                                    더 자세한 분석은 
+                                    <a href="http://192.168.142.68" target="_blank" class="text-decoration-none fw-bold">
+                                        품질예측시스템 <i class="fas fa-external-link-alt ms-1"></i>
+                                    </a>을 이용해주세요
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<!-- LIMS 전용 CSS -->
+<link href="{{ url_for('static', path='css/lims.css') }}" rel="stylesheet">
+<!-- PIMS 통계요약 CSS (차트 스타일 통일용) -->
+<link href="{{ url_for('static', path='css/pims_stats.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', path='js/plotly.min.js') }}"></script>
+<script src="{{ url_for('static', path='js/lims.js') }}"></script>
+{% endblock %} 

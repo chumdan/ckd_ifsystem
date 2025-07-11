@@ -9,7 +9,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 
 from app.config import settings
-from app.controllers import pims, pims_stats
+from app.controllers import pims, pims_stats, lims
 
 # FastAPI 애플리케이션 생성
 app = FastAPI(
@@ -21,6 +21,7 @@ app = FastAPI(
 # API 라우터 등록
 app.include_router(pims.router)
 app.include_router(pims_stats.router)
+app.include_router(lims.router)
 
 # 정적 파일 설정 (CSS, JS, 이미지 등)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -59,6 +60,17 @@ async def pims_stats_page(request: Request):
     return templates.TemplateResponse(
         "pims_stats.html",
         {"request": request, "title": "PIMS 배치요약"}
+    )
+
+
+@app.get("/lims", response_class=HTMLResponse) 
+async def lims_page(request: Request):
+    """
+    LIMS 실험결과 페이지를 보여주는 함수
+    """
+    return templates.TemplateResponse(
+        "lims.html",
+        {"request": request, "title": "LIMS 실험결과"}
     )
 
 

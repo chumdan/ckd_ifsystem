@@ -1,0 +1,231 @@
+/* ========================================
+   LIMS 실험결과 페이지 전용 CSS
+======================================== */
+
+/* 실험결과 페이지 전용 색상 변수 */
+:root {
+    --lims-primary-color: #007bff;     /* 기본 파란색 */
+    --lims-success-color: #28a745;     /* 성공 녹색 */
+    --lims-info-color: #17a2b8;        /* 정보 청록색 */
+    --lims-warning-color: #ffc107;     /* 경고 노란색 */
+    --lims-danger-color: #dc3545;      /* 위험 빨간색 */
+}
+
+/* 실험결과 페이지 고유 스타일 */
+.lims-page {
+    background-color: #f8f9fa;
+}
+
+/* 실험결과 카드 헤더 스타일 */
+.lims-card-header {
+    background: linear-gradient(135deg, var(--lims-primary-color) 0%, #0056b3 100%);
+    color: white;
+    border-bottom: 3px solid #0056b3;
+}
+
+/* 실험결과 처리 안내 박스 */
+.lims-info-box {
+    background: linear-gradient(135deg, var(--lims-info-color) 0%, #138496 100%);
+    border-left: 4px solid #138496;
+}
+
+/* 실험결과 테이블 커스터마이징 */
+.lims-table {
+    font-size: 0.9rem;
+}
+
+.lims-table th {
+    background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+    color: white;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap !important;
+}
+
+.lims-table td {
+    white-space: nowrap !important;
+    text-align: center;
+    vertical-align: middle;
+    word-wrap: normal !important;
+    word-break: keep-all !important;
+    text-overflow: clip !important;
+    overflow: visible !important;
+}
+
+/* 통계량별 색상 구분 (평균, 표준편차 등) */
+.lims-table td[data-stat="평균"] {
+    background-color: #e3f2fd;
+}
+
+.lims-table td[data-stat="표준편차"] {
+    background-color: #f3e5f5;
+}
+
+.lims-table td[data-stat="25%"] {
+    background-color: #e8f5e8;
+}
+
+.lims-table td[data-stat="50%"] {
+    background-color: #fff3e0;
+}
+
+.lims-table td[data-stat="75%"] {
+    background-color: #fce4ec;
+}
+
+/* 실험결과 버튼 스타일 */
+.lims-btn-primary {
+    background: linear-gradient(135deg, var(--lims-primary-color) 0%, #0056b3 100%);
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.lims-btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3 0%, #004494 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+}
+
+/* 실험결과 로딩 스피너 */
+.lims-loading {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid var(--lims-primary-color);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: lims-spin 1s linear infinite;
+}
+
+@keyframes lims-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .lims-table {
+        font-size: 0.8rem;
+    }
+}
+
+/* DataTables 커스터마이징 for 실험결과 페이지 */
+.dataTables_wrapper .dataTables_scroll .dataTables_scrollHead {
+    background: var(--lims-primary-color);
+}
+
+.dataTables_wrapper .dataTables_filter label {
+    color: var(--lims-primary-color);
+    font-weight: 600;
+}
+
+.dataTables_wrapper .dataTables_length label {
+    color: var(--lims-primary-color);
+    font-weight: 600;
+}
+
+.dataTables_wrapper .dataTables_info {
+    color: var(--lims-primary-color);
+    font-weight: 500;
+}
+
+/* 페이지네이션 스타일 */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: var(--lims-primary-color) !important;
+    border-color: var(--lims-primary-color) !important;
+    color: white !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: var(--lims-primary-color) !important;
+    border-color: var(--lims-primary-color) !important;
+    color: white !important;
+}
+
+/* ========================================
+   차트 레이아웃 스타일
+======================================== */
+
+/* 차트 버튼 스타일 개선 */
+#chartGenerateBtn,
+#generateChartBtn1 {
+    background: #214293;
+    color: white;
+    border: none;
+    box-shadow: 0 2px 4px rgba(33, 66, 147, 0.3);
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    border-radius: 6px;
+}
+
+#chartGenerateBtn:hover,
+#generateChartBtn1:hover {
+    background: #1a3575;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(33, 66, 147, 0.4);
+}
+
+#chartGenerateBtn:disabled,
+#generateChartBtn1:disabled {
+    background: #6c757d;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 차트 컨테이너 - Plotly 자동 크기 조정용 */
+.chart-container {
+    position: relative;
+    min-height: 520px;  
+    height: 520px;      
+    padding: 0px;       
+    background-color: #ffffff;
+    overflow: visible !important;
+}
+
+/* Plotly 차트 영역 스타일 - 자동 크기 조정 허용 */
+.chart-container div[id*="Chart"] {
+    width: 100% !important;
+    height: 480px !important;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    background-color: #ffffff;
+    overflow: visible !important;
+}
+
+/* Bootstrap 카드 오버플로우 수정 */
+.chart-container .card,
+.chart-container .card-body {
+    overflow: visible !important;
+}
+
+/* 변수 선택 드롭다운 */
+#chartVariableSelect1 {
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.3s ease;
+}
+
+#chartVariableSelect1:focus {
+    border-color: var(--lims-info-color);
+    box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+}
+
+/* CV 안내 박스 스타일 */
+.alert-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    border-left: 4px solid var(--lims-info-color);
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+/* CV 범례 스타일 */
+.cv-legend {
+    text-align: center;
+    font-size: 0.85rem;
+}
+
+.cv-legend .badge {
+    margin: 0 2px;
+} 
