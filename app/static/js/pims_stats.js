@@ -1355,8 +1355,82 @@ function showChartContainer(show) {
         chartSection.style.display = show ? 'block' : 'none';
     }
     
+    // CV 다운로드 버튼 이벤트 리스너 추가
+    if (show) {
+        const downloadBtn = document.getElementById('downloadCvBtn');
+        if (downloadBtn) {
+            downloadBtn.onclick = downloadCvResults;
+        }
+    }
+    
     // Plotly는 자동으로 반응형이므로 복잡한 설정 불필요! 🚀
     console.log(`📊 차트 컨테이너 ${show ? '표시' : '숨김'} (Plotly 자동 반응형)`);
+}
+
+/**
+ * CV 결과 CSV 다운로드 함수
+ */
+function downloadCvResults() {
+    if (!currentChartData || !currentChartData.cv_data || currentChartData.cv_data.length === 0) {
+        showAlert('다운로드할 CV 데이터가 없습니다.', 'warning');
+        return;
+    }
+
+    try {
+        // CSV 헤더
+        const headers = ['변수명', '변동계수(%)', '안정성평가'];
+        
+        // CSV 데이터 생성
+        const csvData = currentChartData.cv_data.map(item => {
+            // 안정성 평가 분류
+            let stability = '';
+            if (item.cv < 5) {
+                stability = '안정';
+            } else if (item.cv < 15) {
+                stability = '보통';
+            } else {
+                stability = '위험';
+            }
+            
+            return [
+                item.variable,
+                item.cv.toFixed(2),
+                stability
+            ];
+        });
+
+        // CSV 내용 생성
+        const csvContent = [
+            headers.join(','),
+            ...csvData.map(row => row.join(','))
+        ].join('\n');
+
+        // BOM 추가 (엑셀에서 한글 깨짐 방지)
+        const bom = '\uFEFF';
+        const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+
+        // 파일명 생성 (현재 시간 포함)
+        const now = new Date();
+        const timestamp = now.toISOString().slice(0, 19).replace(/[:-]/g, '');
+        const filename = `PIMS_공정안정성평가_${timestamp}.csv`;
+
+        // 다운로드 실행
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        console.log(`📥 CV 결과 다운로드 완료: ${filename}`);
+        showAlert(`CV 결과가 다운로드되었습니다: ${filename}`, 'success');
+
+    } catch (error) {
+        console.error('❌ CV 다운로드 중 오류:', error);
+        showAlert('CV 다운로드 중 오류가 발생했습니다.', 'danger');
+    }
 }
 
 console.log('PIMS 배치요약 통계 모듈이 로드되었습니다.'); 
