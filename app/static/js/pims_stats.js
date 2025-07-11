@@ -963,44 +963,62 @@ function generateChartDataFromStats(statsData) {
         return null;
     }
     
-    // 변수 목록 추출 (평균값 컬럼들)
+    // 변수 목록 추출 (모든 통계값)
     const sampleRow = statsData[0];
-    const variables = [];
+    const variables = [];  // 변수명 + 통계값 조합
     const trendData = {};
     const cvData = [];
     
-    // 평균, 표준편차 컬럼 찾기
+    // 통계값 타입 정의
+    const statTypes = ['평균', '표준편차', '25%', '50%', '75%'];
+    const baseVariables = new Set();
+    
+    // 모든 통계값 컬럼 찾기
     for (const key in sampleRow) {
-        if (key.includes('_평균')) {
-            const varName = key.replace('_평균', '');
-            variables.push(varName);
-            
-            // 트렌드 데이터 생성 (배치별 평균값)
-            trendData[varName] = statsData.map(row => ({
-                batch: row['배치번호'] || row['batch_no'] || 'Unknown',
-                value: parseFloat(row[key]) || 0
-            }));
-            
-            // CV 데이터 생성 (변동계수 = 표준편차/평균 * 100)
-            const stdKey = key.replace('_평균', '_표준편차');
-            if (sampleRow.hasOwnProperty(stdKey)) {
-                const avgValues = statsData.map(row => parseFloat(row[key]) || 0);
-                const stdValues = statsData.map(row => parseFloat(row[stdKey]) || 0);
+        // 통계값 패턴 찾기
+        for (const statType of statTypes) {
+            if (key.includes(`_${statType}`)) {
+                const varName = key.replace(`_${statType}`, '');
+                baseVariables.add(varName);
                 
-                // 전체 평균과 평균 표준편차로 CV 계산
-                const totalAvg = avgValues.reduce((a, b) => a + b, 0) / avgValues.length;
-                const totalStd = stdValues.reduce((a, b) => a + b, 0) / stdValues.length;
-                const cv = totalAvg !== 0 ? (totalStd / totalAvg) * 100 : 0;
+                // 변수명 + 통계값 조합으로 키 생성
+                const combinedKey = `${varName}_${statType}`;
+                variables.push(combinedKey);
                 
-                cvData.push({
-                    variable: varName,
-                    cv: cv
-                });
+                // 트렌드 데이터 생성
+                trendData[combinedKey] = statsData.map(row => ({
+                    batch: row['배치번호'] || row['batch_no'] || 'Unknown',
+                    value: parseFloat(row[key]) || 0
+                }));
+                
+                console.log(`📊 ${combinedKey} 트렌드 데이터 생성`);
+                break;
             }
         }
     }
     
-    console.log(`📊 차트 데이터 생성 완료: ${variables.length}개 변수, ${statsData.length}개 배치`);
+    // CV 데이터 생성 (변동계수 = 표준편차/평균 * 100)
+    baseVariables.forEach(varName => {
+        const avgKey = `${varName}_평균`;
+        const stdKey = `${varName}_표준편차`;
+        
+        if (sampleRow.hasOwnProperty(avgKey) && sampleRow.hasOwnProperty(stdKey)) {
+            const avgValues = statsData.map(row => parseFloat(row[avgKey]) || 0);
+            const stdValues = statsData.map(row => parseFloat(row[stdKey]) || 0);
+            
+            // 전체 평균과 평균 표준편차로 CV 계산
+            const totalAvg = avgValues.reduce((a, b) => a + b, 0) / avgValues.length;
+            const totalStd = stdValues.reduce((a, b) => a + b, 0) / stdValues.length;
+            const cv = totalAvg !== 0 ? (totalStd / totalAvg) * 100 : 0;
+            
+            cvData.push({
+                variable: varName,
+                cv: cv
+            });
+        }
+    });
+    
+    console.log(`📊 차트 데이터 생성 완료: ${variables.length}개 변수×통계값 조합, ${statsData.length}개 배치`);
     
     return {
         variables: variables,
@@ -1117,13 +1135,18 @@ function updateTrendChart(selectedVariable) {
     
     const trendData = currentChartData.trend_data[selectedVariable];
     
+    // 변수명과 통계값 분리
+    const parts = selectedVariable.split('_');
+    const statType = parts[parts.length - 1];  // 마지막 부분이 통계값
+    const varName = parts.slice(0, -1).join('_');  // 나머지는 변수명
+    
     // 📊 Plotly 데이터 준비
     const plotData = [{
         x: trendData.map(d => d.batch),
         y: trendData.map(d => d.value),
         type: 'scatter',
         mode: 'lines+markers',
-        name: `${selectedVariable} 평균값`,
+        name: `${varName} ${statType}`,
         line: {
             color: '#007bff',
             width: 3,
@@ -1144,23 +1167,29 @@ function updateTrendChart(selectedVariable) {
     // 📊 Plotly 레이아웃 설정
     const layout = {
         title: {
-            text: `${selectedVariable} 배치별 트렌드`,
+            text: `${varName} 배치별 트렌드 (${statType})`,
             font: { size: 14, color: '#333' }
         },
         xaxis: {
-            title: '배치번호',
+            title: {
+                text: '배치번호',
+                standoff: 30,  // 제목과 축 사이 거리 늘리기
+                font: { size: 12 }  // 제목 폰트 크기 조정
+            },
             tickangle: -90,  // X축 틱을 90도로 회전
-            automargin: true,  // 자동 마진 조정
+            tickfont: { size: 10 },  // 틱 폰트 크기 작게 설정
+            tickpad: 15,  // 틱 라인과 텍스트 사이 간격 조정
+            automargin: true,  // 자동 마진 조정 복원
             showgrid: true,
             gridcolor: '#e6e6e6'
         },
         yaxis: {
-            title: '평균값',
-            automargin: true,  // 자동 마진 조정
+            title: statType,  // 선택된 통계값으로 Y축 제목 변경
+            automargin: true,  // 자동 마진 조정 복원
             showgrid: true,
             gridcolor: '#e6e6e6'
         },
-        autosize: true,  // 컨테이너 크기에 자동 맞춤
+        height: 430,  // 명시적 높이 설정
         showlegend: false,
         plot_bgcolor: '#fafafa',
         paper_bgcolor: '#ffffff'
@@ -1175,7 +1204,7 @@ function updateTrendChart(selectedVariable) {
     // 🚀 Plotly 차트 생성 (매우 간단!)
     Plotly.newPlot(chartDiv, plotData, layout, config);
     
-    console.log(`📈 ${selectedVariable} 트렌드 차트 렌더링 완료 (Plotly)`);
+    console.log(`📈 ${varName} - ${statType} 트렌드 차트 렌더링 완료 (Plotly)`);
 }
 
 /**
@@ -1226,19 +1255,24 @@ function renderCvChart() {
             font: { size: 14, color: '#333' }
         },
         xaxis: {
-            title: '변수명',
+            title: {
+                text: '변수명',
+                standoff: 30,  // 제목과 축 사이 거리 늘리기
+                font: { size: 12 }  // 제목 폰트 크기 조정
+            },
             tickangle: -90,  // X축 틱을 90도로 회전
-            automargin: true,  // 자동 마진 조정
+            tickpad: 15,  // 틱 라인과 텍스트 사이 간격 조정
+            automargin: true,  // 자동 마진 조정 복원
             showgrid: false
         },
         yaxis: {
             title: '변동계수 (%)',
-            automargin: true,  // 자동 마진 조정
+            automargin: true,  // 자동 마진 조정 복원
             showgrid: true,
             gridcolor: '#e6e6e6',
             zeroline: true
         },
-        autosize: true,  // 컨테이너 크기에 자동 맞춤
+        height: 430,  // 명시적 높이 설정
         showlegend: false,
         plot_bgcolor: '#fafafa',
         paper_bgcolor: '#ffffff'
@@ -1272,7 +1306,13 @@ function updateVariableDropdown() {
         currentChartData.variables.forEach((variable, index) => {
             const option = document.createElement('option');
             option.value = variable;
-            option.textContent = variable;
+            
+            // 변수명과 통계값 분리하여 표시
+            const parts = variable.split('_');
+            const statType = parts[parts.length - 1];  // 마지막 부분이 통계값
+            const varName = parts.slice(0, -1).join('_');  // 나머지는 변수명
+            
+            option.textContent = `${varName} - ${statType}`;
             dropdown.appendChild(option);
             
             // 첫 번째 변수를 기본 선택

@@ -174,21 +174,30 @@
     box-shadow: none;
 }
 
-/* 차트 컨테이너 - Plotly용 간단한 스타일 */
+/* 차트 컨테이너 - Plotly 자동 크기 조정용 */
 .chart-container {
     position: relative;
-    height: 400px;
-    padding: 10px;
+    min-height: 520px;  /* 500px에서 600px로 증가 */
+    height: 520px;      /* 명확한 높이 지정 */
+    padding: 0px;       /* 10px에서 0px로 제거 - 패딩 제거 테스트 */
     background-color: #ffffff;
+    overflow: visible !important;  /* 넘치는 부분이 잘리지 않도록 */
 }
 
-/* Plotly 차트 영역 스타일 (간단하고 깔끔!) */
+/* Plotly 차트 영역 스타일 - 자동 크기 조정 허용 */
 .chart-container div[id*="Chart"] {
     width: 100% !important;
-    height: 380px !important;
+    height: 480px !important;  /* 650px에서 850px로 증가 - X축 텍스트가 y=742 위치에 있음 */
     border: 1px solid #dee2e6;
     border-radius: 4px;
     background-color: #ffffff;
+    overflow: visible !important;  /* 차트가 잘리지 않도록 */
+}
+
+/* Bootstrap 카드 오버플로우 수정 */
+.chart-container .card,
+.chart-container .card-body {
+    overflow: visible !important;
 }
 
 /* 변수 선택 드롭다운 */
