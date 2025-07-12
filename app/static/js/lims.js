@@ -360,8 +360,8 @@ function displayLimsData(data) {
     if (tableElement) {
         limsStatsTable = $(tableElement).DataTable({
             responsive: true,
-            pageLength: 25,
-            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "전체"]],
+            pageLength: 8,
+            lengthMenu: [[8, 15, 25, 50, -1], [8, 15, 25, 50, "전체"]],
             language: {
                 "lengthMenu": "_MENU_ 개씩 보기",
                 "search": "검색:",
@@ -639,12 +639,7 @@ function updateTrendChart(selectedAnalyte) {
         showlegend: false,
         plot_bgcolor: '#fafafa',
         paper_bgcolor: '#ffffff',
-        margin: {
-            l: 60,  // 왼쪽 여백 확보
-            r: 20,  // 오른쪽 여백
-            t: 50,  // 상단 여백
-            b: 100  // 하단 여백 (X축 라벨을 위해 충분히 확보)
-        }
+
     };
     
     const config = {

@@ -187,7 +187,7 @@
 /* Plotly 차트 영역 스타일 - 자동 크기 조정 허용 */
 .chart-container div[id*="Chart"] {
     width: 100% !important;
-    height: 480px !important;
+    /*height: 480px !important; */
     border: 1px solid #dee2e6;
     border-radius: 4px;
     background-color: #ffffff;
