@@ -201,6 +201,16 @@ function searchProcesses(itemCode, batchNo) {
 function searchPimsData() {
     console.log('PIMS 데이터를 조회합니다.');
     
+    // 빅데이터 조회 알람 (배치당 3000~10000건)
+    const confirmMessage = `⚠️ PIMS 빅데이터 조회 \n\n• 배치당 약 3,000~10,000건의 대용량 데이터를 조회합니다.\n• 데이터 양에 따라 조회에 시간이 다소 소요될 수 있습니다.\n• 잠시만 기다려주세요.\n\n빅데이터 조회를 시작하시겠습니까?`;
+    
+    if (!confirm(confirmMessage)) {
+        console.log('사용자가 PIMS 데이터 조회를 취소했습니다.');
+        return;
+    }
+    
+    console.log('사용자가 PIMS 빅데이터 조회를 승인했습니다.');
+    
     // 제품 타입 수집
     const productType = document.getElementById('productType1').value;
     
@@ -613,6 +623,16 @@ function displayPimsData(data) {
  */
 function downloadAllDataAsCSV() {
     console.log('CSV 다운로드를 시작합니다...');
+    
+    // CSV 다운로드 알람
+    const confirmMessage = `💾 PIMS 데이터 CSV 다운로드 \n\n• 모든 데이터를 CSV 파일로 다운로드합니다.\n• 데이터 양에 따라 다운로드에 시간이 다소 소요될 수 있습니다.\n• 잠시만 기다려주세요.\n\nCSV 다운로드를 시작하시겠습니까?`;
+    
+    if (!confirm(confirmMessage)) {
+        console.log('사용자가 CSV 다운로드를 취소했습니다.');
+        return;
+    }
+    
+    console.log('사용자가 CSV 다운로드를 승인했습니다.');
     
     // 다운로드 버튼 비활성화 및 로딩 표시
     const downloadBtn = document.getElementById('downloadCsvBtn');

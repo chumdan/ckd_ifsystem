@@ -194,6 +194,16 @@ function clearStatsBatchTimeContainer() {
 function searchStatsData() {
     console.log('통계 데이터 조회를 시작합니다.');
     
+    // 빅데이터 통계 조회 알람 (배치당 3000~10000건)
+    const confirmMessage = `⚠️ PIMS 배치요약 빅데이터 조회 \n\n• 배치당 약 3,000~10,000건의 대용량 데이터를 통계 처리합니다.\n• 데이터 양에 따라 조회에 시간이 다소 소요될 수 있습니다.\n• 잠시만 기다려주세요.\n\n배치요약 빅데이터 조회를 시작하시겠습니까?`;
+    
+    if (!confirm(confirmMessage)) {
+        console.log('사용자가 PIMS 배치요약 데이터 조회를 취소했습니다.');
+        return;
+    }
+    
+    console.log('사용자가 PIMS 배치요약 빅데이터 조회를 승인했습니다.');
+    
     // 폼 데이터 수집 (기존 pims.js의 검증 로직 재사용)
     const formData = collectStatsFormData();
     
