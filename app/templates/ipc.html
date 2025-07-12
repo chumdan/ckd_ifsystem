@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}생산 IPC 정보 - 개발 중{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 페이지 제목 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="page-title simple-title">
+                <i class="fas fa-chart-line me-2"></i>
+                생산 IPC 정보
+            </h2>
+            <hr>
+        </div>
+    </div>
+
+    <!-- 개발 중 메시지 -->
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-ckd border-warning">
+                <div class="card-header bg-warning text-dark text-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-tools me-2"></i>
+                        🚧 개발 중 🚧
+                    </h4>
+                </div>
+                <div class="card-body text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-cogs fa-5x text-warning mb-3"></i>
+                    </div>
+                    
+                    <h4 class="mb-4">개발 중에 있습니다.</h4>
+                    <h5 class="mb-4 text-muted">완료 후, 오픈 예정입니다.</h5>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="alert alert-info">
+                        <h6 class="mb-2">
+                            <i class="fas fa-phone me-2"></i>
+                            문의사항
+                        </h6>
+                        <p class="mb-0">
+                            <strong>정보기획팀 고동현 주임</strong><br>
+                            <i class="fas fa-phone-alt me-1"></i>
+                            내선: 189
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<!-- IPC 간단 CSS -->
+<link href="{{ url_for('static', path='css/ipc.css') }}" rel="stylesheet">
+{% endblock %}

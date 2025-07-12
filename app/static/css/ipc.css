@@ -1,0 +1,22 @@
+/* 간단한 IPC 개발 중 페이지 CSS */
+
+/* 개발 중 아이콘 애니메이션 */
+.fa-cogs {
+    animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 카드 호버 효과 */
+.card:hover {
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
+}
+
+/* 연락처 정보 스타일 */
+.alert-info {
+    border-radius: 8px;
+}

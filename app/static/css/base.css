@@ -103,10 +103,21 @@ body {
     align-items: center;
 }
 
+/* 네비바 링크 스타일 - Bootstrap 덮어쓰기 */
+.main-navbar .navbar-nav .nav-link {
+    color: white;
+    font-weight: 500;
+    padding: 0 2.0rem !important;  /* Bootstrap 스타일 덮어쓰기 */
+    font-size: 1rem;
+    line-height: 60px;
+    height: 60px;
+    transition: all 0.3s ease;
+}
+
 .navbar-nav .nav-link {
     color: white;
     font-weight: 500;
-    padding: 0 1.5rem;
+    padding: 0 3.5rem !important;  /* Bootstrap 스타일 덮어쓰기 */
     font-size: 1rem;
     line-height: 60px;
     height: 60px;

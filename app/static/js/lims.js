@@ -74,9 +74,29 @@ function handleItemCodeInput() {
     
     if (itemCode.length >= 3) {
         console.log('품목코드 입력됨:', itemCode);
-        searchLimsProduct(itemCode);
+        
+        // 새로운 기능: 확인 메시지 표시 후 조회
+        showBatchSearchConfirm(itemCode);
     } else {
         // 입력이 짧으면 배치/공정 선택 초기화
+        resetBatchAndProcessSelects();
+    }
+}
+
+// 새로운 기능: 배치 조회 확인 메시지
+function showBatchSearchConfirm(itemCode) {
+    const confirmMessage = `품목코드: ${itemCode}\n\n⚠️ 주의사항\n• 해당 품목의 모든 배치 정보를 조회합니다.\n• 데이터가 많을 경우 조회에 시간이 소요될 수 있습니다.\n• 잠시만 기다려주세요.\n\n배치 정보를 조회하시겠습니까?`;
+    
+    console.log('확인 메시지 표시:', confirmMessage);
+    
+    if (confirm(confirmMessage)) {
+        console.log('사용자가 OK를 눌렀습니다. 배치 조회 시작.');
+        // 사용자가 OK를 누르면 기존 배치 조회 실행
+        searchLimsProduct(itemCode);
+    } else {
+        console.log('사용자가 취소를 눌렀습니다.');
+        // 사용자가 취소하면 입력 지우기
+        document.getElementById('itemCode1').value = '';
         resetBatchAndProcessSelects();
     }
 }
