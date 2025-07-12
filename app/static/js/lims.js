@@ -63,6 +63,12 @@ function initializeLimsEventListeners() {
         downloadCvBtn.addEventListener('click', downloadCvResults);
     }
     
+    // 통계 분석용 드롭다운 이벤트 (기본통계량 & 박스플롯)
+    const statsVariableSelect = document.getElementById('statsVariableSelect1');
+    if (statsVariableSelect) {
+        statsVariableSelect.addEventListener('change', updateStatsAnalysis);
+    }
+    
     console.log('✅ LIMS 이벤트 리스너가 등록되었습니다.');
 }
 
@@ -508,8 +514,12 @@ function autoGenerateStatsAnalysis() {
         // 첫 번째 실험항목을 자동 선택
         select.selectedIndex = 1;
         
+        console.log('통계 분석 자동 생성 - 선택된 실험항목:', select.value);
+        
         // 자동으로 통계 분석 생성
         updateStatsAnalysis();
+    } else {
+        console.log('통계 분석 자동 생성 실패 - 선택 옵션이 없음');
     }
 }
 
@@ -1051,16 +1061,26 @@ function updateStatsVariableDropdown(data) {
     });
     
     console.log(`✅ 통계 분석용 드롭다운 업데이트 완료: ${analyteSet.size}개 항목`);
+    
+    // 드롭다운 업데이트 후 이벤트 리스너 재등록 (혹시 몰라서)
+    select.removeEventListener('change', updateStatsAnalysis);
+    select.addEventListener('change', updateStatsAnalysis);
 }
 
 /**
  * 통계 분석 업데이트 (드롭다운 변경 시 호출)
  */
 function updateStatsAnalysis() {
+    console.log('통계 분석 업데이트 시작');
+    
     const selectedAnalyte = document.getElementById('statsVariableSelect1').value;
+    
+    console.log('선택된 실험항목:', selectedAnalyte);
+    console.log('현재 데이터 존재 여부:', !!currentLimsChartData);
     
     if (!selectedAnalyte || !currentLimsChartData) {
         // 선택이 없으면 초기화
+        console.log('선택된 실험항목이 없거나 데이터가 없음 - 초기화');
         resetStatsDisplay();
         return;
     }

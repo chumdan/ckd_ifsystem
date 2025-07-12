@@ -34,11 +34,11 @@ templates = Jinja2Templates(directory="app/templates")
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     """
-    메인 페이지 (추후 로그인 페이지 개발 예정)
+    메인 페이지 - PIMS 조회 페이지로 리다이렉트
     """
     return templates.TemplateResponse(
-        "base.html", 
-        {"request": request, "title": "CKD PIMS/LIMS 조회 시스템"}
+        "pims.html",
+        {"request": request, "title": "PIMS 데이터 조회"}
     )
 
 

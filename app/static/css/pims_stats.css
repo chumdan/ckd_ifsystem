@@ -218,4 +218,71 @@
     border-left: 4px solid var(--stats-info-color);
     border-radius: 6px;
     font-size: 0.85rem;
+}
+
+/* ========================================
+   배치 선택 드롭다운 개선 (PIMS Stats용)
+======================================== */
+
+/* 배치 선택 드롭다운 높이 증가 */
+#batchSelect[multiple],
+#batchSelect1[multiple] {
+    height: auto !important;
+    min-height: 250px; /* 4-5개 배치를 한 번에 볼 수 있도록 */
+    max-height: 350px; /* 너무 길어지지 않도록 제한 */
+    overflow-y: auto;  /* 세로 스크롤 활성화 */
+    padding: 8px;      /* 내부 여백 추가 */
+    font-size: 0.9rem; /* 폰트 크기 약간 줄여서 더 많이 보이게 */
+    line-height: 1.3;  /* 줄 간격 조정 */
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+}
+
+/* 배치 선택 옵션 스타일 개선 */
+#batchSelect[multiple] option,
+#batchSelect1[multiple] option {
+    padding: 6px 10px;  /* 옵션 내부 여백 */
+    line-height: 1.4;   /* 줄 간격 */
+    border-bottom: 1px solid #f0f0f0; /* 옵션 간 구분선 */
+    transition: background-color 0.2s ease; /* 호버 효과 */
+}
+
+/* 배치 선택 옵션 호버 효과 */
+#batchSelect[multiple] option:hover,
+#batchSelect1[multiple] option:hover {
+    background-color: #e3f2fd; /* 연한 파란색 배경 */
+}
+
+/* 선택된 배치 옵션 스타일 */
+#batchSelect[multiple] option:checked,
+#batchSelect1[multiple] option:checked {
+    background-color: var(--stats-primary-color, #007bff); /* 파란색 배경 */
+    color: white;              /* 흰색 텍스트 */
+    font-weight: 500;          /* 약간 굵은 글씨 */
+}
+
+/* 배치 선택 박스 테두리 강화 */
+#batchSelect[multiple]:focus,
+#batchSelect1[multiple]:focus {
+    border-color: var(--stats-primary-color, #007bff);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+/* 비활성화 상태 스타일 */
+#batchSelect[multiple]:disabled,
+#batchSelect1[multiple]:disabled {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    opacity: 0.6;
+}
+
+/* 배치 선택 도움말 텍스트 강화 */
+#batchSelect + .form-text,
+#batchSelect1 + .form-text {
+    color: #6c757d;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-top: 4px;
 } 
