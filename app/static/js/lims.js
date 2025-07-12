@@ -456,8 +456,14 @@ function showChartAnalysis(limsData) {
         // 실험항목 드롭다운 업데이트
         updateVariableDropdown(limsData);
         
+        // 새로운 기능: 통계 분석용 드롭다운 업데이트
+        updateStatsVariableDropdown(limsData);
+        
         // PIMS와 동일하게 자동으로 차트 생성 (버튼 없이 바로)
         autoGenerateCharts();
+        
+        // 새로운 기능: 통계량/박스플롯 자동 생성
+        autoGenerateStatsAnalysis();
     }
 }
 
@@ -471,6 +477,19 @@ function autoGenerateCharts() {
         
         // 자동으로 차트 생성 (PIMS와 동일)
         generateChartsFromCachedData();
+    }
+}
+
+// 새로운 기능: 통계 분석 자동 생성
+function autoGenerateStatsAnalysis() {
+    const select = document.getElementById('statsVariableSelect1');
+    
+    if (select && select.options.length > 1) {
+        // 첫 번째 실험항목을 자동 선택
+        select.selectedIndex = 1;
+        
+        // 자동으로 통계 분석 생성
+        updateStatsAnalysis();
     }
 }
 
@@ -974,4 +993,286 @@ function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
+}
+
+// ========================================
+// 새로운 기능: 기본통계량 & 박스플롯
+// ========================================
+
+/**
+ * 통계 분석용 드롭다운 업데이트
+ */
+function updateStatsVariableDropdown(data) {
+    const select = document.getElementById('statsVariableSelect1');
+    if (!select || !data || data.length === 0) return;
+    
+    // 기존 옵션 제거
+    select.innerHTML = '<option value="">실험항목을 선택하세요</option>';
+    
+    // 숫자형 FINAL 값을 가진 ANALYTE들 추출
+    const analyteSet = new Set();
+    
+    data.forEach(row => {
+        const analyte = row.ANALYTE;
+        const finalValue = row.FINAL;
+        
+        // ANALYTE와 FINAL이 존재하고, FINAL이 순수 숫자인 경우만
+        if (analyte && finalValue && isNumericValue(finalValue)) {
+            analyteSet.add(analyte);
+        }
+    });
+    
+    // ANALYTE들을 정렬하여 옵션 추가
+    Array.from(analyteSet).sort().forEach(analyte => {
+        const option = document.createElement('option');
+        option.value = analyte;
+        option.textContent = analyte;
+        select.appendChild(option);
+    });
+    
+    console.log(`✅ 통계 분석용 드롭다운 업데이트 완료: ${analyteSet.size}개 항목`);
+}
+
+/**
+ * 통계 분석 업데이트 (드롭다운 변경 시 호출)
+ */
+function updateStatsAnalysis() {
+    const selectedAnalyte = document.getElementById('statsVariableSelect1').value;
+    
+    if (!selectedAnalyte || !currentLimsChartData) {
+        // 선택이 없으면 초기화
+        resetStatsDisplay();
+        return;
+    }
+    
+    console.log('통계 분석 업데이트:', selectedAnalyte);
+    
+    // 기본통계량 표시
+    renderBasicStats(selectedAnalyte);
+    
+    // 박스플롯 렌더링
+    renderBoxPlot(selectedAnalyte);
+}
+
+/**
+ * 기본통계량 표시
+ */
+function renderBasicStats(selectedAnalyte) {
+    if (!currentLimsChartData || currentLimsChartData.length === 0) {
+        console.log('기본통계량: 데이터가 없습니다.');
+        return;
+    }
+    
+    // 선택된 ANALYTE에 해당하고 FINAL이 숫자인 데이터만 필터링
+    const filteredData = currentLimsChartData.filter(row => 
+        row.ANALYTE === selectedAnalyte && isNumericValue(row.FINAL)
+    );
+    
+    if (filteredData.length === 0) {
+        document.getElementById('basicStatsContainer1').innerHTML = `
+            <div class="text-warning text-center py-3">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                선택된 실험항목에 대한 숫자 데이터가 없습니다.
+            </div>
+        `;
+        return;
+    }
+    
+    // 숫자 값들 추출
+    const values = filteredData.map(row => parseFloat(row.FINAL));
+    
+    // 통계량 계산
+    const stats = calculateStats(values);
+    
+    // HTML 생성
+    const statsHTML = `
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+                <tbody>
+                    <tr>
+                        <td class="fw-bold bg-light">데이터 수</td>
+                        <td>${stats.count}개</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold bg-light">평균</td>
+                        <td>${stats.mean}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold bg-light">표준편차</td>
+                        <td>${stats.std}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold bg-light">최소값</td>
+                        <td>${stats.min}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold bg-light">25% 분위수</td>
+                        <td>${stats.q1}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold bg-light">중앙값 (50%)</td>
+                        <td>${stats.median}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold bg-light">75% 분위수</td>
+                        <td>${stats.q3}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold bg-light">최대값</td>
+                        <td>${stats.max}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    document.getElementById('basicStatsContainer1').innerHTML = statsHTML;
+    console.log(`✅ ${selectedAnalyte} 기본통계량 표시 완료`);
+}
+
+/**
+ * 박스플롯 렌더링 (배치 정보 포함)
+ */
+function renderBoxPlot(selectedAnalyte) {
+    if (!currentLimsChartData || currentLimsChartData.length === 0) {
+        console.log('박스플롯: 데이터가 없습니다.');
+        return;
+    }
+    
+    // 선택된 ANALYTE에 해당하고 FINAL이 숫자인 데이터만 필터링
+    const filteredData = currentLimsChartData.filter(row => 
+        row.ANALYTE === selectedAnalyte && isNumericValue(row.FINAL)
+    );
+    
+    if (filteredData.length === 0) {
+        document.getElementById('boxPlotChart1').innerHTML = `
+            <div class="text-warning text-center py-5">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                선택된 실험항목에 대한 숫자 데이터가 없습니다.
+            </div>
+        `;
+        return;
+    }
+    
+    // 숫자 값들과 배치 정보 추출
+    const values = filteredData.map(row => parseFloat(row.FINAL));
+    
+    // hover text 생성 (배치 정보 포함)
+    const hoverText = filteredData.map(row => {
+        const batch = row.CHARG || row.batchNo || 'Unknown';
+        const testNo = row.TESTNO || 'Unknown';
+        const value = parseFloat(row.FINAL);
+        return `배치: ${batch}<br>시험번호: ${testNo}<br>측정값: ${value}`;
+    });
+    
+    // Plotly 박스플롯 데이터
+    const trace = {
+        y: values,
+        type: 'box',
+        name: selectedAnalyte,
+        marker: {
+            color: '#17a2b8'
+        },
+        boxpoints: 'all',  // 모든 데이터 포인트 표시
+        jitter: 0.3,       // 점들을 좌우로 흩어서 가독성 증대
+        pointpos: -1.8,    // 점들을 박스 왼쪽에 배치
+        text: hoverText,    // hover 시 표시될 텍스트 (배치 정보 포함)
+        hovertemplate: '%{text}<extra></extra>'  // hover 템플릿 사용자 정의
+    };
+    
+    const layout = {
+        title: {
+            text: `${selectedAnalyte} 분포 박스플롯`,
+            font: { size: 14, color: '#333' }
+        },
+        yaxis: {
+            title: '측정값',
+            automargin: true,
+            showgrid: true,
+            gridcolor: '#e6e6e6'
+        },
+        xaxis: {
+            showticklabels: false  // X축 라벨 숨기기 (단일 변수이므로)
+        },
+        height: 280,
+        showlegend: false,
+        plot_bgcolor: '#fafafa',
+        paper_bgcolor: '#ffffff',
+        margin: { t: 40, b: 20, l: 60, r: 20 }
+    };
+    
+    const config = {
+        responsive: true,
+        displayModeBar: false
+    };
+    
+    Plotly.newPlot('boxPlotChart1', [trace], layout, config);
+    console.log(`✅ ${selectedAnalyte} 박스플롯 렌더링 완료 (배치 정보 포함)`);
+}
+
+/**
+ * 통계량 계산 함수
+ */
+function calculateStats(values) {
+    if (!values || values.length === 0) return null;
+    
+    // 정렬
+    const sorted = values.slice().sort((a, b) => a - b);
+    const n = sorted.length;
+    
+    // 평균
+    const mean = values.reduce((sum, val) => sum + val, 0) / n;
+    
+    // 표준편차
+    const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / (n - 1);
+    const std = Math.sqrt(variance);
+    
+    // 분위수 계산
+    const q1 = getPercentile(sorted, 0.25);
+    const median = getPercentile(sorted, 0.5);
+    const q3 = getPercentile(sorted, 0.75);
+    
+    return {
+        count: n,
+        mean: mean.toFixed(3),
+        std: std.toFixed(3),
+        min: sorted[0].toFixed(3),
+        q1: q1.toFixed(3),
+        median: median.toFixed(3),
+        q3: q3.toFixed(3),
+        max: sorted[n-1].toFixed(3)
+    };
+}
+
+/**
+ * 분위수 계산 함수
+ */
+function getPercentile(sortedArray, percentile) {
+    const index = (sortedArray.length - 1) * percentile;
+    const lower = Math.floor(index);
+    const upper = Math.ceil(index);
+    const weight = index % 1;
+    
+    if (upper >= sortedArray.length) return sortedArray[lower];
+    
+    return sortedArray[lower] * (1 - weight) + sortedArray[upper] * weight;
+}
+
+/**
+ * 통계 표시 초기화
+ */
+function resetStatsDisplay() {
+    document.getElementById('basicStatsContainer1').innerHTML = `
+        <div class="text-muted text-center py-3">
+            <i class="fas fa-info-circle me-2"></i>
+            실험항목을 선택하면 통계량이 표시됩니다
+        </div>
+    `;
+    
+    document.getElementById('boxPlotChart1').innerHTML = `
+        <div class="text-muted text-center py-5">
+            <i class="fas fa-info-circle me-2"></i>
+            실험항목을 선택하면 박스플롯이 표시됩니다
+        </div>
+    `;
 } 
