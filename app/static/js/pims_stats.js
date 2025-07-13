@@ -1443,4 +1443,382 @@ function downloadCvResults() {
     }
 }
 
-console.log('PIMS 배치요약 통계 모듈이 로드되었습니다.'); 
+console.log('PIMS 배치요약 통계 모듈이 로드되었습니다.');
+
+// ========================================
+// 새로운 기능: 기본통계량 & 박스플롯 (기존 기능 손상 없이 추가)
+// ========================================
+
+/**
+ * 기존 displayStatsData 함수 후에 자동 호출되는 통계 기능
+ */
+function initializeStatsFeature(data) {
+    console.log('✨ 새로운 기능: 기본통계량 & 박스플롯 초기화 시작', data?.length, '개 데이터');
+    
+    if (!data || data.length === 0) {
+        console.log('데이터가 없어서 통계 기능을 초기화할 수 없습니다.');
+        return;
+    }
+    
+    // 기본통계량 드롭다운 업데이트
+    updateStatsDropdown(data);
+    
+    // 첫 번째 변수 자동 선택 및 통계 표시
+    autoSelectFirstVariable(data);
+}
+
+/**
+ * 기본통계량 드롭다운 업데이트
+ */
+function updateStatsDropdown(data) {
+    const select = document.getElementById('statsVariableSelect');
+    if (!select) {
+        console.error('❌ statsVariableSelect 요소를 찾을 수 없습니다!');
+        return;
+    }
+    
+    // 기존 옵션 제거
+    select.innerHTML = '<option value="">변수를 선택하세요</option>';
+    
+    // 첫 번째 데이터 행에서 열 이름들 가져오기
+    const firstRow = data[0];
+    const excludeKeys = ['배치번호', '품목코드', '공정코드', 'batchNo', 'batch'];
+    
+    // 제외할 키들을 뺄 모든 키들을 변수로 처리
+    const variables = Object.keys(firstRow).filter(key => {
+        const keyLower = key.toLowerCase();
+        return !excludeKeys.includes(key) && 
+               !keyLower.includes('time') && 
+               !keyLower.includes('timestamp') &&
+               !keyLower.includes('batch');
+    });
+    
+    console.log('발견된 변수들:', variables);
+    
+    // 변수들을 정렬하여 옵션 추가
+    variables.sort().forEach(variable => {
+        const option = document.createElement('option');
+        option.value = variable;
+        option.textContent = variable;
+        select.appendChild(option);
+    });
+    
+    console.log(`✅ 기본통계량 드롭다운 업데이트 완룼: ${variables.length}개 변수`);
+    
+    // 이벤트 리스너 등록
+    select.removeEventListener('change', onStatsVariableChange);
+    select.addEventListener('change', onStatsVariableChange);
+    
+    return variables;
+}
+
+/**
+ * 첫 번째 변수 자동 선택 및 통계 표시
+ */
+function autoSelectFirstVariable(data) {
+    const select = document.getElementById('statsVariableSelect');
+    if (!select) return;
+    
+    const variables = updateStatsDropdown(data);
+    if (!variables || variables.length === 0) {
+        console.log('사용 가능한 변수가 없습니다.');
+        return;
+    }
+    
+    // 첫 번째 변수 자동 선택
+    const firstVariable = variables[0];
+    select.value = firstVariable;
+    
+    console.log('✅ 첫 번째 변수 자동 선택:', firstVariable);
+    
+    // 즐시 통계 표시
+    setTimeout(() => {
+        displayStatsForVariable(firstVariable, data);
+    }, 100);
+}
+
+/**
+ * 변수 선택 시 호출되는 이벤트 핸들러
+ */
+function onStatsVariableChange() {
+    const select = document.getElementById('statsVariableSelect');
+    const selectedVariable = select.value;
+    
+    console.log('변수 선택 변경:', selectedVariable);
+    
+    if (!selectedVariable) {
+        resetStatsDisplay();
+        return;
+    }
+    
+    // 현재 데이터를 사용하여 통계 표시 (currentChartData 활용)
+    if (window.currentChartData && window.currentChartData.data) {
+        displayStatsForVariable(selectedVariable, window.currentChartData.data);
+    }
+}
+
+/**
+ * 선택된 변수에 대한 통계량과 박스플롯 표시
+ */
+function displayStatsForVariable(selectedVariable, data) {
+    console.log('통계 표시 시작:', selectedVariable);
+    
+    if (!data || data.length === 0) {
+        console.log('데이터가 없습니다.');
+        return;
+    }
+    
+    // 기본통계량 렌더링
+    renderBasicStats(selectedVariable, data);
+    
+    // 박스플롯 렌더링
+    renderBoxPlot(selectedVariable, data);
+}
+
+/**
+ * 기본통계량 렌더링
+ */
+function renderBasicStats(selectedVariable, data) {
+    console.log('기본통계량 렌더링:', selectedVariable);
+    
+    // 선택된 변수의 데이터 추출
+    const values = [];
+    data.forEach(row => {
+        const value = row[selectedVariable];
+        if (value !== null && value !== undefined && value !== '') {
+            values.push(parseFloat(value));
+        }
+    });
+    
+    if (values.length === 0) {
+        document.getElementById('basicStatsContainer').innerHTML = `
+            <div class="text-warning text-center py-3">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                선택된 변수에 대한 데이터가 없습니다.
+            </div>
+        `;
+        return;
+    }
+    
+    // 통계량 계산
+    const stats = calculateBasicStats(values);
+    
+    // HTML 생성
+    const statsHTML = `
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+                <tbody>
+                    <tr>
+                        <td class="fw-bold bg-light">배치 수</td>
+                        <td>${stats.count}개</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold bg-light">평균</td>
+                        <td>${stats.mean}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold bg-light">표준편차</td>
+                        <td>${stats.std}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold bg-light">최소값</td>
+                        <td>${stats.min}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold bg-light">25% 분위수</td>
+                        <td>${stats.q1}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold bg-light">중앙값 (50%)</td>
+                        <td>${stats.median}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold bg-light">75% 분위수</td>
+                        <td>${stats.q3}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold bg-light">최대값</td>
+                        <td>${stats.max}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    document.getElementById('basicStatsContainer').innerHTML = statsHTML;
+    console.log(`✅ ${selectedVariable} 기본통계량 표시 완룼`);
+}
+
+/**
+ * 박스플롯 렌더링
+ */
+function renderBoxPlot(selectedVariable, data) {
+    console.log('박스플롯 렌더링:', selectedVariable);
+    
+    // 선택된 변수의 데이터 추출
+    const plotData = [];
+    data.forEach(row => {
+        const value = row[selectedVariable];
+        const batch = row['배치번호'] || row.batchNo || row.batch || 'Unknown';
+        
+        if (value !== null && value !== undefined && value !== '') {
+            plotData.push({
+                value: parseFloat(value),
+                batch: batch
+            });
+        }
+    });
+    
+    if (plotData.length === 0) {
+        document.getElementById('boxPlotChart').innerHTML = `
+            <div class="text-warning text-center py-5">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                선택된 변수에 대한 데이터가 없습니다.
+            </div>
+        `;
+        return;
+    }
+    
+    // Plotly 박스플롯 데이터
+    const values = plotData.map(item => item.value);
+    const hoverText = plotData.map(item => `배치: ${item.batch}<br>측정값: ${item.value}`);
+    
+    const trace = {
+        y: values,
+        type: 'box',
+        name: selectedVariable,
+        marker: {
+            color: '#17a2b8'
+        },
+        boxpoints: 'all',
+        jitter: 0.3,
+        pointpos: -1.8,
+        text: hoverText,
+        hovertemplate: '%{text}<extra></extra>'
+    };
+    
+    const layout = {
+        title: {
+            text: `${selectedVariable} 분포 박스플롯 (배치별 위치)`,
+            font: { size: 14, color: '#333' }
+        },
+        yaxis: {
+            title: '측정값',
+            automargin: true,
+            showgrid: true,
+            gridcolor: '#e6e6e6'
+        },
+        xaxis: {
+            showticklabels: false
+        },
+        height: 280,
+        showlegend: false,
+        plot_bgcolor: '#fafafa',
+        paper_bgcolor: '#ffffff',
+        margin: { t: 40, b: 20, l: 60, r: 20 }
+    };
+    
+    const config = {
+        responsive: true,
+        displayModeBar: false
+    };
+    
+    Plotly.newPlot('boxPlotChart', [trace], layout, config);
+    console.log(`✅ ${selectedVariable} 박스플롯 렌더링 완룼`);
+}
+
+/**
+ * 통계량 계산 함수
+ */
+function calculateBasicStats(values) {
+    if (!values || values.length === 0) return null;
+    
+    const sorted = values.slice().sort((a, b) => a - b);
+    const n = sorted.length;
+    
+    // 평균
+    const mean = values.reduce((sum, val) => sum + val, 0) / n;
+    
+    // 표준편차
+    const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / (n - 1);
+    const std = Math.sqrt(variance);
+    
+    // 분위수 계산
+    const q1 = getPercentile(sorted, 0.25);
+    const median = getPercentile(sorted, 0.5);
+    const q3 = getPercentile(sorted, 0.75);
+    
+    return {
+        count: n,
+        mean: mean.toFixed(3),
+        std: std.toFixed(3),
+        min: sorted[0].toFixed(3),
+        q1: q1.toFixed(3),
+        median: median.toFixed(3),
+        q3: q3.toFixed(3),
+        max: sorted[n-1].toFixed(3)
+    };
+}
+
+/**
+ * 분위수 계산 함수
+ */
+function getPercentile(sortedArray, percentile) {
+    const index = (sortedArray.length - 1) * percentile;
+    const lower = Math.floor(index);
+    const upper = Math.ceil(index);
+    const weight = index % 1;
+    
+    if (upper >= sortedArray.length) return sortedArray[lower];
+    
+    return sortedArray[lower] * (1 - weight) + sortedArray[upper] * weight;
+}
+
+/**
+ * 통계 표시 초기화
+ */
+function resetStatsDisplay() {
+    document.getElementById('basicStatsContainer').innerHTML = `
+        <div class="text-muted text-center py-3">
+            <i class="fas fa-info-circle me-2"></i>
+            변수를 선택하면 통계량이 표시됩니다
+        </div>
+    `;
+    
+    document.getElementById('boxPlotChart').innerHTML = `
+        <div class="text-muted text-center py-5">
+            <i class="fas fa-info-circle me-2"></i>
+            변수를 선택하면 박스플롯이 표시됩니다
+        </div>
+    `;
+}
+
+// 기존 displayStatsData 함수 끝에서 호출하도록 훁업 (monkey patch)
+if (typeof window !== 'undefined') {
+    // 기존 displayStatsData 함수를 래핑하여 새로운 기능 추가
+    const originalDisplayStatsData = window.displayStatsData;
+    
+    if (originalDisplayStatsData) {
+        window.displayStatsData = function(data) {
+            // 기존 기능 실행
+            const result = originalDisplayStatsData.call(this, data);
+            
+            // 새로운 기능 추가
+            console.log('✨ 기존 displayStatsData 실행 후 새로운 기능 초기화');
+            
+            // 전역 변수에 데이터 저장 (박스플롯에서 사용)
+            window.currentChartData = { data: data };
+            
+            // 새로운 기능 초기화
+            setTimeout(() => {
+                initializeStatsFeature(data);
+            }, 500); // 기존 기능이 완전히 로드된 후 실행
+            
+            return result;
+        };
+        
+        console.log('✅ displayStatsData 함수를 새로운 기능으로 확장했습니다.');
+    } else {
+        console.warn('⚠️ displayStatsData 함수를 찾을 수 없습니다.');
+    }
+} 
